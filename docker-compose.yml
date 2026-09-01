@@ -1,0 +1,31 @@
+# Podium — pile locale complete.
+#   SSO_SECRET=$(openssl rand -hex 32) docker compose up --build
+#
+# Un seul service : comptes, parties et defis vivent dans un fichier SQLite.
+
+services:
+  podium:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-3000}:3000"
+      - "127.0.0.1:${METRICS_PORT:-9464}:9464"
+    environment:
+      # Obligatoire : partage avec les jeux, qui verifient le cookie d'identite avec lui.
+      SSO_SECRET: ${SSO_SECRET:?definir SSO_SECRET, par exemple avec openssl rand -hex 32}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      SSO_COOKIE_DOMAIN: ${SSO_COOKIE_DOMAIN:-}
+      ADMIN_PSEUDOS: ${ADMIN_PSEUDOS:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      TIME_ZONE: ${TIME_ZONE:-Europe/Paris}
+    volumes:
+      - podium-data:/app/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 4s
+      start_period: 20s
+
+volumes:
+  podium-data:

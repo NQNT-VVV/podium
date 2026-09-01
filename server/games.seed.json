@@ -1,0 +1,28 @@
+[
+  {
+    "slug": "refrain",
+    "name": "Refrain",
+    "tagline": "Le blind test ou tout le monde reprend en choeur.",
+    "description": "Un animateur, un ecran, et la salle qui repond depuis son telephone. Reponse libre ou buzzer, 17 listes pretes, extraits de 30 secondes.",
+    "emoji": "🎧",
+    "color": "#22d3ee",
+    "url": "https://refrain.danwalex.com",
+    "status": "live",
+    "sort": 10,
+    "modes": [
+      { "id": "daily", "label": "Musique du jour", "emoji": "🎵", "period": "daily", "metric": "best_score", "description": "Six ecoutes, de plus en plus longues, pour trouver le morceau du jour. Le meme pour tout le monde." }
+    ]
+  },
+  {
+    "slug": "arena",
+    "name": "Arena",
+    "tagline": "Des contraintes, un chrono, et tout le monde cree.",
+    "description": "L'animateur impose des elements et un temps, les participants creent — beat, montage, affiche, texte — puis tout le monde note en aveugle avant que le classement revele les auteurs.",
+    "emoji": "🎨",
+    "color": "#8b5cf6",
+    "url": "https://arena.danwalex.com",
+    "status": "live",
+    "sort": 20,
+    "modes": []
+  }
+]

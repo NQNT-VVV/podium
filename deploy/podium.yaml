@@ -1,0 +1,168 @@
+# Podium — deploiement minimal.
+#   kubectl create namespace podium
+#   kubectl -n podium create secret generic podium \
+#     --from-literal=SSO_SECRET=$(openssl rand -hex 32)
+#   kubectl apply -f deploy/podium.yaml
+#
+# Le meme SSO_SECRET va dans le Secret `podium-integration` de chaque jeu
+# (cle PODIUM_SSO_SECRET) : c'est lui qui rend le cookie d'identite lisible.
+#
+# Une seule instance : la base est un fichier SQLite sur un volume. `Recreate`
+# pour que deux pods n'ecrivent jamais le meme fichier.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: podium
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: podium-data
+  namespace: podium
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podium
+  namespace: podium
+  labels:
+    app.kubernetes.io/name: podium
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: podium
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: podium
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: podium
+          image: ghcr.io/nqnt-vvv/podium:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+            - name: metrics
+              containerPort: 9464
+          env:
+            - name: PORT
+              value: "3000"
+            - name: METRICS_PORT
+              value: "9464"
+            - name: DATA_DIR
+              value: /app/data
+            - name: PUBLIC_URL
+              value: https://podium.danwalex.com
+            # Le cookie d'identite doit etre lu par arena.danwalex.com et refrain.danwalex.com.
+            - name: SSO_COOKIE_DOMAIN
+              value: .danwalex.com
+            - name: TIME_ZONE
+              value: Europe/Paris
+            - name: SSO_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: podium
+                  key: SSO_SECRET
+            # Connexion Discord : facultative. Sans le secret, le bouton n'apparait pas.
+            - name: DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: podium-discord
+                  key: DISCORD_CLIENT_ID
+                  optional: true
+            - name: DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: podium-discord
+                  key: DISCORD_CLIENT_SECRET
+                  optional: true
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 160Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: podium-data
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: podium
+  namespace: podium
+  labels:
+    app.kubernetes.io/name: podium
+spec:
+  selector:
+    app.kubernetes.io/name: podium
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+    - name: metrics
+      port: 9464
+      targetPort: metrics
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: podium
+  namespace: podium
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: podium.danwalex.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: podium
+                port:
+                  name: http
