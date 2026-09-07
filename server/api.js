@@ -226,7 +226,7 @@ function register(app) {
   /* ---- Authentification ------------------------------------------- */
 
   app.get('/api/auth/me', guard((req, res) => {
-    res.json({ user: userView(req.user), providers: { password: true, discord: discord.enabled() } });
+    res.json({ user: userView(req.user), providers: { password: config.auth.passwordLogin, discord: discord.enabled() } });
   }));
 
   app.post('/api/auth/register', guard((req, res) => {

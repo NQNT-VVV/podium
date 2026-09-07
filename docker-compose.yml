@@ -18,6 +18,8 @@ services:
       ADMIN_PSEUDOS: ${ADMIN_PSEUDOS:-}
       DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      ADMIN_DISCORD_IDS: ${ADMIN_DISCORD_IDS:-}
+      PASSWORD_LOGIN: ${PASSWORD_LOGIN:-}
       TIME_ZONE: ${TIME_ZONE:-Europe/Paris}
     volumes:
       - podium-data:/app/data

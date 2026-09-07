@@ -187,12 +187,18 @@ function requireAdmin(req) {
 /* Inscription / connexion                                            */
 /* ------------------------------------------------------------------ */
 
-function roleFor(norm) {
+function roleFor(norm, discordId = null) {
   if (repo.userCount() === 0) return 'admin';
+  if (discordId && config.adminDiscordIds.includes(String(discordId))) return 'admin';
   return config.adminPseudos.map(normalizePseudo).includes(norm) ? 'admin' : 'player';
 }
 
+function requirePasswordLogin() {
+  if (!config.auth.passwordLogin) throw new ApiError('La connexion se fait par Discord.', 404);
+}
+
 function register({ pseudo, password, avatar }) {
+  requirePasswordLogin();
   const v = validatePseudo(pseudo);
   if (v.error) throw new ApiError(v.error);
   const pass = validatePassword(password);
@@ -208,6 +214,7 @@ function register({ pseudo, password, avatar }) {
 }
 
 function login({ pseudo, password }, ip) {
+  requirePasswordLogin();
   checkAttempts(ip);
   const user = repo.userByNorm(normalizePseudo(pseudo));
   if (!user || !user.hasPassword || !verifyPassword(String(password || ''), user.passwordHash)) {
@@ -240,6 +247,7 @@ function updateProfile(user, { pseudo, avatar }) {
 }
 
 function changePassword(user, { current, next }) {
+  requirePasswordLogin();
   if (user.hasPassword && !verifyPassword(String(current || ''), user.passwordHash)) throw new ApiError('Mot de passe actuel incorrect.', 401);
   repo.setPassword(user.id, hashPassword(validatePassword(next)));
 }
@@ -247,5 +255,5 @@ function changePassword(user, { current, next }) {
 module.exports = {
   hashPassword, verifyPassword, parseCookies, cookieString, appendCookie,
   signSso, verifySso, openSession, refreshSso, closeSession, attachUser, requireUser, requireAdmin,
-  register, login, freePseudoFrom, updateProfile, changePassword, roleFor,
+  register, login, freePseudoFrom, updateProfile, changePassword, roleFor, requirePasswordLogin,
 };

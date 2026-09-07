@@ -8,7 +8,7 @@ import { toast } from '@/lib/toast';
 import type { Me } from '@/lib/types';
 import { AVATARS } from './avatars';
 
-export function ProfileSettings({ user, discord, linked }: { user: Me; discord: boolean; linked: boolean }) {
+export function ProfileSettings({ user, discord, password, linked }: { user: Me; discord: boolean; password: boolean; linked: boolean }) {
   const router = useRouter();
   const [pseudo, setPseudo] = useState(user.pseudo);
   const [avatar, setAvatar] = useState(user.avatar);
@@ -65,6 +65,7 @@ export function ProfileSettings({ user, discord, linked }: { user: Me; discord: 
       </form>
 
       <div className="col" style={{ gap: 20 }}>
+        {password && (
         <form className="card pad form" onSubmit={savePassword}>
           <h2 style={{ fontSize: 20 }}>{user.hasPassword ? 'Mot de passe' : 'Definir un mot de passe'}</h2>
           {user.hasPassword && (
@@ -79,13 +80,14 @@ export function ProfileSettings({ user, discord, linked }: { user: Me; discord: 
           </label>
           <div className="actions"><button className="btn" type="submit" disabled={busy}>Changer</button></div>
         </form>
+        )}
 
         {discord && (
           <div className="card pad form">
             <h2 style={{ fontSize: 20 }}>Discord</h2>
             {linked
               ? <p className="muted" style={{ fontSize: 14 }}>Compte Discord rattache : <b>{user.discordName}</b>. Tu peux te connecter en un clic.</p>
-              : <p className="muted" style={{ fontSize: 14 }}>Rattache ton Discord pour te connecter sans mot de passe.</p>}
+              : <p className="muted" style={{ fontSize: 14 }}>{password ? 'Rattache ton Discord pour te connecter sans mot de passe.' : 'Rattache ton Discord pour garder ce compte : c’est desormais la seule facon de se connecter.'}</p>}
             {!linked && <div className="actions"><a className="btn discord" href="/api/auth/discord">Rattacher Discord</a></div>}
           </div>
         )}

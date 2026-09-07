@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit",
     "test:rating": "node test/rating.mjs",
     "test:periods": "node test/periods.mjs",
+    "test:auth": "node test/auth-modes.mjs",
     "pretest": "node scripts/check-node.js",
     "test": "node test/e2e.mjs"
   },

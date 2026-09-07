@@ -10,7 +10,8 @@
     "status": "live",
     "sort": 10,
     "modes": [
-      { "id": "daily", "label": "Musique du jour", "emoji": "🎵", "period": "daily", "metric": "best_score", "description": "Six ecoutes, de plus en plus longues, pour trouver le morceau du jour. Le meme pour tout le monde." }
+      { "id": "daily", "label": "Musique du jour", "emoji": "🎵", "period": "daily", "metric": "best_score", "description": "Six ecoutes, de plus en plus longues, pour trouver le morceau du jour. Le meme pour tout le monde." },
+      { "id": "weekly", "label": "Playlist de la semaine", "emoji": "📀", "period": "weekly", "metric": "best_score", "description": "Cinq morceaux tires pour la semaine, six ecoutes chacun, une seule tentative. Le score cumule fait le classement." }
     ]
   },
   {

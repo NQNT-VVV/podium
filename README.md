@@ -16,7 +16,7 @@ lance, recoit leurs classements et publie leur calendrier de defis.
 | Brique | Ce qu'elle apporte |
 |---|---|
 | **Catalogue** | Une fiche par jeu : accroche, URL, modes, statut. Ajouter un jeu se fait dans l'admin, sans code. |
-| **Comptes** | Pseudo + mot de passe (scrypt), ou Discord en un clic si configure. Aucun e-mail. |
+| **Comptes** | **Connexion Discord** (OAuth2, portee `identify`) : un clic, un compte par personne, aucun mot de passe. Sans Discord configure (developpement), pseudo + mot de passe scrypt. |
 | **Identite partagee (SSO)** | A la connexion, un cookie signe `nqnt_id` est pose sur `.danwalex.com`. Les jeux le lisent : pseudo pre-rempli, resultats rattaches au compte. |
 | **Ranked** | Elo multijoueur par jeu, trois parties de placement, paliers Bronze → Argent → Or → Platine → Diamant → Legende. |
 | **Saison** | Un mois. Chaque partie multijoueur rapporte de 10 (dernier) a 110 (premier) points. Classement global et par jeu. |
@@ -38,8 +38,17 @@ npm install
 npm run dev            # http://localhost:3000
 ```
 
-Le **premier compte cree est administrateur**. Ouvre `/admin`, genere la cle
+Le **premier compte cree est administrateur**, ainsi que les identifiants
+Discord listes dans `ADMIN_DISCORD_IDS`. Ouvre `/admin`, genere la cle
 d'ingestion de chaque jeu, copie-la dans sa configuration (voir plus bas).
+
+**Connexion.** En local, sans identifiants Discord, on se connecte par pseudo et
+mot de passe. En production, des que `DISCORD_CLIENT_ID` et
+`DISCORD_CLIENT_SECRET` sont renseignes, **Discord est la seule porte
+d'entree** : les routes d'inscription et de connexion par mot de passe repondent
+404. `PASSWORD_LOGIN=1` les rouvre si vraiment necessaire. Les sessions deja
+ouvertes restent valides, et un compte cree par mot de passe peut rattacher son
+Discord depuis `/moi` pour continuer a se connecter.
 
 En production, `SSO_SECRET` est **obligatoire** : c'est le secret que les jeux
 utilisent pour verifier le cookie d'identite. Un secret tire au demarrage les
@@ -141,6 +150,7 @@ deploy/           manifeste Kubernetes
 ```bash
 npm run test:rating     # Elo, points, paliers
 npm run test:periods    # semaines ISO et changements d'heure
+npm run test:auth       # Discord seul : mot de passe ferme, redirection OAuth
 npm test                # parcours complet sur serveur reel (API seule)
 ```
 
@@ -154,7 +164,8 @@ kubectl apply -f deploy/podium.yaml
 
 Puis, pour chaque jeu, le Secret `podium-integration` dans son namespace avec
 `PODIUM_URL`, `PODIUM_GAME_KEY` (generee dans `/admin`) et `PODIUM_SSO_SECRET`
-(la meme valeur que `SSO_SECRET`). Discord : voir `deploy/discord-secret.example.yaml`.
+(la meme valeur que `SSO_SECRET`). Discord (obligatoire pour que quelqu'un
+puisse se connecter en production) : voir `deploy/discord-secret.example.yaml`.
 
 L'image est construite par GitHub Actions a chaque push sur `main`
 (`ghcr.io/nqnt-vvv/podium`).

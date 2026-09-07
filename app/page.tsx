@@ -20,7 +20,7 @@ export default async function HomePage() {
         <p>Un compte, tous les jeux. Chaque partie compte pour ta cote, la saison en cours et les defis de la semaine.</p>
         {!me.user && (
           <div className="row wrap" style={{ justifyContent: 'center' }}>
-            <Link className="btn primary lg" href="/connexion">Creer mon compte</Link>
+            <Link className="btn primary lg" href="/connexion">{me.providers.password ? 'Creer mon compte' : 'Se connecter avec Discord'}</Link>
             <Link className="btn lg" href="/classement">Voir le classement</Link>
           </div>
         )}

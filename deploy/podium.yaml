@@ -83,7 +83,8 @@ spec:
                 secretKeyRef:
                   name: podium
                   key: SSO_SECRET
-            # Connexion Discord : facultative. Sans le secret, le bouton n'apparait pas.
+            # Connexion Discord. Des que le secret existe, c'est la seule facon de
+            # se connecter (PASSWORD_LOGIN reste a faux). Voir deploy/discord-secret.example.yaml.
             - name: DISCORD_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -95,6 +96,13 @@ spec:
                 secretKeyRef:
                   name: podium-discord
                   key: DISCORD_CLIENT_SECRET
+                  optional: true
+            # Identifiants Discord (snowflakes, separes par des virgules) administrateurs.
+            - name: ADMIN_DISCORD_IDS
+              valueFrom:
+                secretKeyRef:
+                  name: podium-discord
+                  key: ADMIN_DISCORD_IDS
                   optional: true
           readinessProbe:
             httpGet:
