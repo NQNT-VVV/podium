@@ -22,6 +22,9 @@ metadata:
   namespace: podium
 spec:
   accessModes: ["ReadWriteOnce"]
+  # Classe « retain » du cluster : ce volume porte les comptes et tout
+  # l'historique, il doit survivre a une suppression du PVC.
+  storageClassName: local-path-retain
   resources:
     requests:
       storage: 2Gi
