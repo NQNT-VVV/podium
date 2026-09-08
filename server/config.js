@@ -124,6 +124,13 @@ const config = {
 
   /** Frequence du planificateur (defis a creer, defis a clore). */
   schedulerMs: int('SCHEDULER_S', 300) * 1000,
+
+  /**
+   * Depart automatique : un compte sans connexion depuis autant de jours est
+   * supprime (parties anonymisees). 0 desactive. Les administrateurs sont
+   * epargnes : un hub sans admin ne se repare plus.
+   */
+  inactiveAccountDays: int('INACTIVE_ACCOUNT_DAYS', 730),
 };
 
 module.exports = config;

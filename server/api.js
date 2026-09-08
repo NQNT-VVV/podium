@@ -254,6 +254,19 @@ function register(app) {
     res.json({ user: userView(user) });
   }));
 
+  app.get('/api/auth/export', guard((req, res) => {
+    const user = auth.requireUser(req);
+    res.set('Content-Disposition', `attachment; filename="podium-${user.pseudoNorm.replace(/[^a-z0-9]+/g, '-')}.json"`);
+    res.json(auth.exportAccount(user));
+  }));
+
+  app.delete('/api/auth/me', guard((req, res) => {
+    const user = auth.requireUser(req);
+    auth.deleteAccount(user, req.body || {});
+    auth.closeSession(req, res);
+    res.json({ ok: true });
+  }));
+
   app.post('/api/auth/password', guard((req, res) => {
     auth.changePassword(auth.requireUser(req), req.body || {});
     res.json({ ok: true });

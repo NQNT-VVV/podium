@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Noto_Color_Emoji, Space_Grotesk } from 'next/font/google';
 
 import { Aurora } from '@/components/Aurora';
+import { Footer } from '@/components/Footer';
 import { Nav } from '@/components/Nav';
 import { Toaster } from '@/components/Toaster';
 import './globals.css';
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Aurora />
         <Nav />
         {children}
+        <Footer />
         <Toaster />
       </body>
     </html>

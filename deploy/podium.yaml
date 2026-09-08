@@ -78,6 +78,9 @@ spec:
               value: .danwalex.com
             - name: TIME_ZONE
               value: Europe/Paris
+            # Depart automatique : comptes sans connexion depuis deux ans.
+            - name: INACTIVE_ACCOUNT_DAYS
+              value: "730"
             - name: SSO_SECRET
               valueFrom:
                 secretKeyRef:

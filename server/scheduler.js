@@ -18,9 +18,22 @@ function tick() {
     if (closed.length) console.log(`[podium] ${closed.length} defi(s) clos : ${closed.map((c) => c.slug).join(', ')}`);
     repo.purgeSessions();
     repo.purgeLogs(Date.now() - 30 * 86400000);
+    const gone = purgeInactive();
+    if (gone) console.log(`[podium] ${gone} compte(s) inactif(s) supprime(s)`);
   } catch (err) {
     console.error('[podium] planificateur', err);
   }
+}
+
+/** Depart automatique des comptes sans connexion depuis INACTIVE_ACCOUNT_DAYS. */
+function purgeInactive(now = Date.now()) {
+  if (!config.inactiveAccountDays) return 0;
+  let n = 0;
+  for (const user of repo.inactiveUsers(now - config.inactiveAccountDays * 86400000)) {
+    repo.deleteUser(user.id);
+    n += 1;
+  }
+  return n;
 }
 
 function start() {
@@ -30,4 +43,4 @@ function start() {
   return timer;
 }
 
-module.exports = { start, tick };
+module.exports = { start, tick, purgeInactive };

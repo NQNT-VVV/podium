@@ -24,6 +24,7 @@ lance, recoit leurs classements et publie leur calendrier de defis.
 | **Defis « mode »** | Le jeu implemente un mode (musique du jour, pack de la semaine) ; Podium publie la periode et une **graine identique pour tous**, puis classe. |
 | **Badges** | A la cloture d'un defi, les trois premiers recoivent un badge sur leur profil. |
 | **Profils** | Cotes par jeu avec courbe, saison, badges, historique des parties. |
+| **Donnees et depart** | Page `/confidentialite` (aucun but commercial, usage technique). Export JSON de ses donnees, suppression de compte immediate en libre-service, purge automatique des comptes inactifs depuis deux ans. |
 | **Admin** | Jeux et cles d'ingestion, defis speciaux, planificateur, journal des resultats recus. |
 
 ---
@@ -69,7 +70,8 @@ SSO_SECRET=$(openssl rand -hex 32) docker compose up --build
 | `/classement` | Saison (globale ou par jeu, saisons passees) et ranked par jeu |
 | `/defis` · `/defis/:slug` | Defis en cours, a venir, palmares ; classement complet d'un defi |
 | `/joueurs/:pseudo` | Profil public : cotes, courbe, saison, badges, historique |
-| `/connexion` · `/moi` | Compte, avatar, mot de passe, rattachement Discord |
+| `/connexion` · `/moi` | Compte, avatar, rattachement Discord, export des donnees, suppression du compte |
+| `/confidentialite` | Ce que Podium garde, pourquoi, combien de temps, et comment partir |
 | `/admin` | Reserve aux administrateurs |
 
 ---
@@ -116,6 +118,12 @@ placement avant d'afficher un palier.
 **Saison.** Points par partie multijoueur : `round(100 × (N − rang) / (N − 1)) + 10`.
 La saison est le mois civil, fuseau `TIME_ZONE`.
 
+**Depart.** Un compte se supprime seul depuis `/moi` : sessions, cotes et
+badges partent avec lui, ses lignes dans les parties deviennent « Joueur
+parti ». Sans connexion pendant `INACTIVE_ACCOUNT_DAYS` (730 par defaut), le
+planificateur fait la meme chose de lui-meme ; les administrateurs sont
+epargnes. `GET /api/auth/export` rend toutes les donnees du compte en JSON.
+
 **Defis.** Six criteres : `wins`, `podiums`, `matches`, `points`, `best_score`,
 `score_sum`. Un defi peut filtrer sur un mode du jeu et un nombre minimal de
 joueurs. Les gabarits hebdomadaires sont dans `server/challenges/templates.js`.
@@ -151,6 +159,7 @@ deploy/           manifeste Kubernetes
 npm run test:rating     # Elo, points, paliers
 npm run test:periods    # semaines ISO et changements d'heure
 npm run test:auth       # Discord seul : mot de passe ferme, redirection OAuth
+npm run test:offboarding # suppression de compte, anonymisation, purge des inactifs
 npm test                # parcours complet sur serveur reel (API seule)
 ```
 

@@ -37,6 +37,7 @@ jobs:
         run: |
           npm run test:rating
           npm run test:periods
+          npm run test:offboarding
 
       - name: Build Next
         run: npm run build

@@ -89,6 +89,11 @@ const q = {
   linkDiscord: db.prepare('UPDATE user SET discord_id = ?, discord_name = ? WHERE id = ?'),
   setRole: db.prepare('UPDATE user SET role = ? WHERE id = ?'),
   searchUsers: db.prepare('SELECT * FROM user WHERE pseudo_norm LIKE ? ORDER BY pseudo LIMIT 10'),
+  inactiveUsers: db.prepare("SELECT * FROM user WHERE last_seen_at < ? AND role != 'admin'"),
+  anonymizeMatchPlayers: db.prepare("UPDATE match_player SET user_id = NULL, nickname = @nickname, avatar = '' WHERE user_id = @userId"),
+  deleteUser: db.prepare('DELETE FROM user WHERE id = ?'),
+  userMatchesAll: db.prepare(`SELECT m.*, mp.position, mp.score, mp.rank, mp.rating_before, mp.rating_after, mp.points
+    FROM match_player mp JOIN match m ON m.id = mp.match_id WHERE mp.user_id = ? ORDER BY m.played_at DESC`),
 
   insertSession: db.prepare('INSERT INTO session (id, user_id, created_at, expires_at, agent) VALUES (?, ?, ?, ?, ?)'),
   sessionById: db.prepare('SELECT * FROM session WHERE id = ? AND expires_at > ?'),
@@ -237,6 +242,19 @@ module.exports = {
   linkDiscord: (id, discordId, name) => q.linkDiscord.run(discordId, name, id),
   setRole: (id, role) => q.setRole.run(role, id),
   searchUsers: (norm) => q.searchUsers.all(`${norm}%`).map(toUser),
+  inactiveUsers: (before) => q.inactiveUsers.all(before).map(toUser),
+  /**
+   * Depart d'un compte : les parties restent (elles appartiennent aussi aux
+   * autres joueurs) mais sa ligne y devient anonyme ; tout le reste — sessions,
+   * cotes, badges — part avec lui par cascade.
+   */
+  deleteUser: (id) => db.transaction(() => {
+    q.anonymizeMatchPlayers.run({ userId: id, nickname: 'Joueur parti' });
+    return q.deleteUser.run(id).changes;
+  })(),
+  userMatchesAll: (userId) => q.userMatchesAll.all(userId).map((r) => ({
+    ...toMatch(r), position: r.position, score: r.score, rank: r.rank, ratingBefore: r.rating_before, ratingAfter: r.rating_after, points: r.points,
+  })),
 
   // sessions
   insertSession: (id, userId, createdAt, expiresAt, agent) => q.insertSession.run(id, userId, createdAt, expiresAt, agent),
