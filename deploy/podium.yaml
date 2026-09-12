@@ -22,6 +22,9 @@ metadata:
   namespace: podium
 spec:
   accessModes: ["ReadWriteOnce"]
+  # Classe « retain » du cluster : ce volume porte les comptes et tout
+  # l'historique, il doit survivre a une suppression du PVC.
+  storageClassName: local-path-retain
   resources:
     requests:
       storage: 2Gi
@@ -75,12 +78,16 @@ spec:
               value: .danwalex.com
             - name: TIME_ZONE
               value: Europe/Paris
+            # Depart automatique : comptes sans connexion depuis deux ans.
+            - name: INACTIVE_ACCOUNT_DAYS
+              value: "730"
             - name: SSO_SECRET
               valueFrom:
                 secretKeyRef:
                   name: podium
                   key: SSO_SECRET
-            # Connexion Discord : facultative. Sans le secret, le bouton n'apparait pas.
+            # Connexion Discord. Des que le secret existe, c'est la seule facon de
+            # se connecter (PASSWORD_LOGIN reste a faux). Voir deploy/discord-secret.example.yaml.
             - name: DISCORD_CLIENT_ID
               valueFrom:
                 secretKeyRef:
@@ -92,6 +99,13 @@ spec:
                 secretKeyRef:
                   name: podium-discord
                   key: DISCORD_CLIENT_SECRET
+                  optional: true
+            # Identifiants Discord (snowflakes, separes par des virgules) administrateurs.
+            - name: ADMIN_DISCORD_IDS
+              valueFrom:
+                secretKeyRef:
+                  name: podium-discord
+                  key: ADMIN_DISCORD_IDS
                   optional: true
           readinessProbe:
             httpGet:

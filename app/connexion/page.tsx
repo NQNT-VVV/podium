@@ -20,9 +20,11 @@ export default async function LoginPage({ searchParams }: Props) {
           <p>Un compte Podium te suit dans tous les jeux : ton pseudo est reconnu, tes parties comptent, tes defis se cumulent.</p>
         </div>
       </header>
-      <AuthForm discord={me.providers.discord} initialError={sp.erreur} />
+      <AuthForm discord={me.providers.discord} passwordLogin={me.providers.password} initialError={sp.erreur} />
       <p className="faint" style={{ fontSize: 12.5, textAlign: 'center' }}>
-        Podium ne stocke qu’un pseudo, un avatar et un mot de passe hache. Rien d’autre.
+        {me.providers.password
+          ? 'Podium ne stocke qu’un pseudo, un avatar et un mot de passe hache. Rien d’autre.'
+          : 'Podium ne garde que ton identifiant Discord, ton pseudo et ton avatar. Aucun acces a tes messages ni a tes serveurs.'}
       </p>
     </main>
   );

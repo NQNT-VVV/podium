@@ -21,7 +21,7 @@ export default async function MePage({ searchParams }: Props) {
         </div>
       </header>
       {sp.discord === 'ok' && <div className="pill ok" style={{ alignSelf: 'flex-start' }}>Discord rattache.</div>}
-      <ProfileSettings user={me.user} discord={me.providers.discord} linked={!!me.user.discordName} />
+      <ProfileSettings user={me.user} discord={me.providers.discord} password={me.providers.password} linked={!!me.user.discordName} />
     </main>
   );
 }

@@ -37,12 +37,15 @@ jobs:
         run: |
           npm run test:rating
           npm run test:periods
+          npm run test:offboarding
 
       - name: Build Next
         run: npm run build
 
       - name: Parcours complet sur serveur reel
-        run: npm test
+        run: |
+          npm run test:auth
+          npm test
 
       - uses: docker/setup-buildx-action@v3
 

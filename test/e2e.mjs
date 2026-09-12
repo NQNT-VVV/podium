@@ -249,6 +249,29 @@ try {
   assert.match(m, /podium_results_total\{game="refrain",status="ok"\} 5/);
   assert.match(m, /podium_users 3/);
 
+  // Export et depart en libre-service.
+  r = await call('bob', 'GET', '/api/auth/export');
+  assert.equal(r.status, 200);
+  assert.equal(r.json.account.pseudo, 'Bob');
+  assert.ok(r.json.matches.length >= 1);
+  r = await call('bob', 'DELETE', '/api/auth/me', { confirm: 'pas moi' });
+  assert.equal(r.status, 400);
+  r = await call('bob', 'DELETE', '/api/auth/me', { confirm: 'bob' });
+  assert.equal(r.status, 200, r.text);
+  assert.equal(jars.get('bob').podium_session, undefined, 'cookies effaces');
+  r = await call('bob', 'GET', '/api/auth/me');
+  assert.equal(r.json.user, null);
+  r = await call('nobody', 'GET', '/api/players/bob');
+  assert.equal(r.status, 404);
+  r = await call('nobody', 'GET', '/api/games/refrain');
+  assert.ok(!r.json.ladder.some((x) => x.pseudo === 'Bob'), 'plus au classement');
+  const first = r.json.matches.find((m) => m.id.endsWith(':ABCD-1'));
+  const bobLine = first.players.find((p) => p.rank === 3);
+  assert.equal(bobLine.userId, null);
+  assert.equal(bobLine.nickname, 'Joueur parti');
+  r = await call('nobody', 'GET', '/api/health');
+  assert.equal(r.json.users, 2);
+
   console.log('e2e : OK');
 } catch (err) {
   console.error(err);

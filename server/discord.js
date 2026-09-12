@@ -13,9 +13,9 @@ const crypto = require('crypto');
 const config = require('./config');
 const repo = require('./repo');
 const auth = require('./auth');
-const { newId, ApiError } = require('./util');
+const { newId, normalizePseudo, ApiError } = require('./util');
 
-const enabled = () => Boolean(config.discord.clientId && config.discord.clientSecret);
+const enabled = () => config.discord.configured;
 const STATE_COOKIE = 'podium_oauth';
 
 function redirectUri(req) {
@@ -76,12 +76,17 @@ async function callback(req, res) {
   }
   if (!user) {
     const pseudo = auth.freePseudoFrom(discordName);
+    const norm = normalizePseudo(pseudo);
     const now = Date.now();
     user = repo.insertUser({
-      id: newId('u_'), pseudo, pseudoNorm: require('./util').normalizePseudo(pseudo), avatar: '🎮',
-      passwordHash: null, discordId: me.id, discordName, role: auth.roleFor(require('./util').normalizePseudo(pseudo)),
+      id: newId('u_'), pseudo, pseudoNorm: norm, avatar: '🎮',
+      passwordHash: null, discordId: me.id, discordName, role: auth.roleFor(norm, me.id),
       createdAt: now, lastSeenAt: now,
     });
+  } else if (user.role !== 'admin' && config.adminDiscordIds.includes(String(me.id))) {
+    // Un identifiant ajoute a ADMIN_DISCORD_IDS apres coup prend effet a la connexion suivante.
+    repo.setRole(user.id, 'admin');
+    user = repo.userById(user.id);
   }
   auth.openSession(res, user, req);
   res.redirect('/');

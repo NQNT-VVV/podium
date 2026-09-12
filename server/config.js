@@ -23,6 +23,12 @@ const int = (name, fallback) => {
   return Number.isFinite(n) ? Math.trunc(n) : fallback;
 };
 
+const bool = (name, fallback) => {
+  const raw = process.env[name];
+  if (raw === undefined || raw === '') return fallback;
+  return /^(1|true|yes|on)$/i.test(raw);
+};
+
 const list = (name, fallback) => {
   const raw = process.env[name];
   if (raw === undefined || raw === '') return fallback;
@@ -47,6 +53,7 @@ const SSO_SECRET = str('SSO_SECRET', null) || (() => {
 })();
 
 const publicUrl = str('PUBLIC_URL', '').replace(/\/+$/, '');
+const discordConfigured = Boolean(str('DISCORD_CLIENT_ID', '') && str('DISCORD_CLIENT_SECRET', ''));
 
 const config = {
   dev,
@@ -77,11 +84,24 @@ const config = {
 
   /** Pseudos promus administrateurs a l'inscription. Le premier compte cree l'est toujours. */
   adminPseudos: list('ADMIN_PSEUDOS', []),
+  /** Identifiants Discord (snowflakes) promus administrateurs a la connexion. */
+  adminDiscordIds: list('ADMIN_DISCORD_IDS', []),
 
-  /** Connexion Discord : inerte sans identifiants. */
+  /**
+   * Connexion Discord : inerte sans identifiants.
+   *
+   * Des que Discord est configure, c'est la seule porte d'entree : pas de
+   * mot de passe a gerer, un seul compte par personne. La connexion par
+   * pseudo et mot de passe ne sert qu'en local, ou si PASSWORD_LOGIN la
+   * reactive explicitement.
+   */
   discord: {
     clientId: str('DISCORD_CLIENT_ID', ''),
     clientSecret: str('DISCORD_CLIENT_SECRET', ''),
+    configured: discordConfigured,
+  },
+  auth: {
+    passwordLogin: bool('PASSWORD_LOGIN', !discordConfigured),
   },
 
   /** Fuseau des saisons, semaines et jours. */
@@ -104,6 +124,13 @@ const config = {
 
   /** Frequence du planificateur (defis a creer, defis a clore). */
   schedulerMs: int('SCHEDULER_S', 300) * 1000,
+
+  /**
+   * Depart automatique : un compte sans connexion depuis autant de jours est
+   * supprime (parties anonymisees). 0 desactive. Les administrateurs sont
+   * epargnes : un hub sans admin ne se repare plus.
+   */
+  inactiveAccountDays: int('INACTIVE_ACCOUNT_DAYS', 730),
 };
 
 module.exports = config;

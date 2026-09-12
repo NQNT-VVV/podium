@@ -22,6 +22,9 @@ const BY_GAME = {
   refrain: [
     { id: 'oreille', emoji: '👂', metric: 'best_score', title: 'Oreille absolue', description: 'Le plus gros score sur une seule partie de blind test.', params: { minPlayers: 2 } },
     { id: 'semaine-du-jour', emoji: '🎵', metric: 'score_sum', title: 'La semaine du jour', description: 'Cumul des musiques du jour de la semaine : sept matins, sept morceaux.', params: { mode: 'daily' } },
+    { id: 'buzzer-d-or', emoji: '🔔', metric: 'wins', title: 'Buzzer d’or', description: 'Le plus de victoires en mode buzzer : premier a appuyer, premier a avoir raison.', params: { mode: 'buzzer', minPlayers: 2 } },
+    { id: 'vrai-fan', emoji: '🎤', metric: 'wins', title: 'T’es un vrai fan ?', description: 'Le plus de victoires en mode artiste, sur un seul artiste toute la partie.', params: { mode: 'artist', minPlayers: 2 } },
+    { id: 'cumul', emoji: '📚', metric: 'score_sum', title: 'Discotheque', description: 'Le plus de points cumules sur toutes les parties multijoueur de la semaine.', params: { minPlayers: 2 } },
   ],
   arena: [
     { id: 'chef-d-oeuvre', emoji: '🖼️', metric: 'best_score', title: 'Chef-d’oeuvre', description: 'La meilleure note moyenne obtenue sur un rendu cette semaine.', params: { minPlayers: 2 } },

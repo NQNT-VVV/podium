@@ -187,12 +187,18 @@ function requireAdmin(req) {
 /* Inscription / connexion                                            */
 /* ------------------------------------------------------------------ */
 
-function roleFor(norm) {
+function roleFor(norm, discordId = null) {
   if (repo.userCount() === 0) return 'admin';
+  if (discordId && config.adminDiscordIds.includes(String(discordId))) return 'admin';
   return config.adminPseudos.map(normalizePseudo).includes(norm) ? 'admin' : 'player';
 }
 
+function requirePasswordLogin() {
+  if (!config.auth.passwordLogin) throw new ApiError('La connexion se fait par Discord.', 404);
+}
+
 function register({ pseudo, password, avatar }) {
+  requirePasswordLogin();
   const v = validatePseudo(pseudo);
   if (v.error) throw new ApiError(v.error);
   const pass = validatePassword(password);
@@ -208,6 +214,7 @@ function register({ pseudo, password, avatar }) {
 }
 
 function login({ pseudo, password }, ip) {
+  requirePasswordLogin();
   checkAttempts(ip);
   const user = repo.userByNorm(normalizePseudo(pseudo));
   if (!user || !user.hasPassword || !verifyPassword(String(password || ''), user.passwordHash)) {
@@ -240,12 +247,36 @@ function updateProfile(user, { pseudo, avatar }) {
 }
 
 function changePassword(user, { current, next }) {
+  requirePasswordLogin();
   if (user.hasPassword && !verifyPassword(String(current || ''), user.passwordHash)) throw new ApiError('Mot de passe actuel incorrect.', 401);
   repo.setPassword(user.id, hashPassword(validatePassword(next)));
 }
 
+/** Suppression en libre-service : le pseudo retape sert de confirmation. */
+function deleteAccount(user, { confirm }) {
+  if (normalizePseudo(confirm) !== user.pseudoNorm) throw new ApiError('Retape ton pseudo exactement pour confirmer.', 400);
+  repo.deleteUser(user.id);
+}
+
+/** Tout ce que le hub sait d'un compte, en un objet : le droit d'acces, sans formulaire. */
+function exportAccount(user) {
+  return {
+    exportedAt: new Date().toISOString(),
+    account: {
+      id: user.id, pseudo: user.pseudo, avatar: user.avatar, role: user.role, discordId: user.discordId, discordName: user.discordName,
+      createdAt: new Date(user.createdAt).toISOString(), lastSeenAt: new Date(user.lastSeenAt).toISOString(), hasPassword: user.hasPassword,
+    },
+    ratings: repo.userRatings(user.id).map((r) => ({ game: r.game_slug, rating: r.rating, matches: r.matches, wins: r.wins, podiums: r.podiums, peak: r.peak })),
+    badges: repo.userBadges(user.id),
+    matches: repo.userMatchesAll(user.id).map((m) => ({
+      game: m.gameSlug, mode: m.mode, playedAt: new Date(m.playedAt).toISOString(), players: m.playersCount,
+      score: m.score, rank: m.rank, ratingBefore: m.ratingBefore, ratingAfter: m.ratingAfter, points: m.points, challengeId: m.challengeId,
+    })),
+  };
+}
+
 module.exports = {
-  hashPassword, verifyPassword, parseCookies, cookieString, appendCookie,
+  hashPassword, verifyPassword, deleteAccount, exportAccount, parseCookies, cookieString, appendCookie,
   signSso, verifySso, openSession, refreshSso, closeSession, attachUser, requireUser, requireAdmin,
-  register, login, freePseudoFrom, updateProfile, changePassword, roleFor,
+  register, login, freePseudoFrom, updateProfile, changePassword, roleFor, requirePasswordLogin,
 };
