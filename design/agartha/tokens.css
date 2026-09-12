@@ -13,7 +13,7 @@
    .55 est le premier a atteindre 4.5:1 sur le fond (texte lisible), .45 le premier a atteindre
    3:1 (element d'interface percevable). Sans eux, .40 sert de texte a 2.83:1 et .25 de bordure
    a 1.75:1 : les filets disparaissent et l'interface perd toute structure. */
---ink-55:rgba(217,210,195,.55);--ink-45:rgba(217,210,195,.45);
+--ink-55:rgba(217,210,195,.55);--ink-45:rgba(217,210,195,.45);--gold-18:rgba(201,154,46,.18);
 /* --- BORDURE · RADIUS : une épaisseur, zéro arrondi --- */
 /* --border sert de separateur interne (2.42:1, assume : il ordonne sans crier).
    --border-ui habille tout ce qui se clique ou se saisit et tient le seuil de 3:1. */
@@ -33,13 +33,29 @@
 /* Niveau de lecture continue. Le systeme d'origine est une vitrine : ses six niveaux servent
    des libelles courts, aucun ne porte un paragraphe. --t-prose comble ce manque, dans la meme
    police et la meme famille de tailles, avec l'interlignage et la casse qu'exige un texte suivi. */
+--t-read:var(--fs-2)/1.6 var(--font-mono);
 --t-prose:14px/1.65 var(--font-mono);
 --ls-prose:.02em;
+/* ECHELLE D'USAGE — un role, un jeton.
+   --t-display  affiche, nom du hub, code de salle
+   --t-h1       titre de page, titre de section
+   --t-h2       titre de carte
+   --t-data     donnee vivante : chrono, cote, score
+   --t-ui       corps d'interface : cellules, boutons, champs, navigation
+   --t-read     texte suivi qui EST le contenu : pages legales, consigne
+   --t-prose    texte suivi qui ANNOTE : description de carte, etat vide, aide
+   --t-meta     badges, horodates, en-tetes de colonne, compteurs, index hexa
+   Regle de controle : une chaine lue pour elle-meme n'est pas en --t-meta. */
 /* --- ESPACEMENT : base 4, 10 pas --- */
 --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-6:24px;--sp-8:32px;--sp-12:48px;--sp-16:64px;--sp-24:96px;--sp-32:128px;
 --gutter:var(--sp-4);--margin:clamp(var(--sp-4),4vw,var(--sp-16));
 /* --- MOTION : coupes sèches --- */
 --dur-0:0ms;--dur-flash:80ms;--dur-blink:600ms;--ease-cut:steps(3,end);--ease-hold:steps(1,end);
+/* Duree d'un retour au doigt ou a la souris. Une coupe seche n'est pas l'absence de
+   mouvement : c'est un changement franc, en deux paliers, qu'on percoit sans le voir
+   glisser. Sans elle l'interface ne repond pas, ce qui se lit comme « pas fini ». */
+--dur-tap:120ms;--ease-tap:steps(2,end);
+--tap:var(--dur-tap) var(--ease-tap);
 /* --- TEXTURES : dithering Bayer 4×4 (seuils 2/4/6/8/12 sur 16), hachures, grain --- */
 --dither-12:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");
 --dither-25:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 0h1v1H2zM0 2h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");

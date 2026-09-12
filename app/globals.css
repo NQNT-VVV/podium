@@ -66,8 +66,6 @@
 .block-head a.more { font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--ink-60); white-space: nowrap; }
 .block-head a.more:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
 
-.empty { position: relative; padding: var(--sp-6) var(--sp-4) var(--sp-6) var(--sp-6); color: var(--ink-60); font: var(--t-meta); letter-spacing: var(--ls-mono); border: var(--border); }
-.empty::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background-image: var(--dither-37); background-size: var(--dither-size); }
 
 /* --------------------------------------------------------------------------
    Accueil : l'affiche

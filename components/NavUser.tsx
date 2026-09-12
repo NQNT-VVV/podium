@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+import { Icon } from '@/components/Icon';
 import { api } from '@/lib/client';
 import { toast } from '@/lib/toast';
 import type { Me } from '@/lib/types';
@@ -41,10 +42,10 @@ export function NavUser({ user }: { user: Me }) {
       </button>
       {open && (
         <div className="nav-menu" role="menu">
-          <Link href={`/joueurs/${encodeURIComponent(user.pseudo)}`} onClick={() => setOpen(false)}>MON PROFIL<span className="meta">→</span></Link>
-          <Link href="/moi" onClick={() => setOpen(false)}>REGLAGES<span className="meta">→</span></Link>
-          {user.role === 'admin' && <Link href="/admin" onClick={() => setOpen(false)}>ADMINISTRATION<span className="meta">0x00</span></Link>}
-          <button type="button" onClick={logout}>SE DECONNECTER<span className="meta">×</span></button>
+          <Link href={`/joueurs/${encodeURIComponent(user.pseudo)}`} onClick={() => setOpen(false)}>MON PROFIL<Icon name="fleche-d" /></Link>
+          <Link href="/moi" onClick={() => setOpen(false)}>REGLAGES<Icon name="fleche-d" /></Link>
+          {user.role === 'admin' && <Link href="/admin" onClick={() => setOpen(false)}>ADMINISTRATION<Icon name="reglages" /></Link>}
+          <button type="button" onClick={logout}>SE DECONNECTER<Icon name="croix" /></button>
         </div>
       )}
     </div>
