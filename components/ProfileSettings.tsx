@@ -78,7 +78,7 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
             ))}
           </div>
         </div>
-        <div className="actions"><button className="btn primary" type="submit" disabled={busy}>ENREGISTRER</button></div>
+        <div className="actions"><button className="btn primary" type="submit" disabled={busy} aria-busy={busy}>{busy ? <>ENREGISTREMENT<span className="loading-dots" aria-hidden="true"><span /><span /><span /></span></> : 'ENREGISTRER'}</button></div>
       </form>
 
       <div className="col" style={{ gap: 20 }}>
@@ -95,7 +95,7 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
             <span>NOUVEAU</span>
             <input className="input" type="password" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" required minLength={6} />
           </label>
-          <div className="actions"><button className="btn" type="submit" disabled={busy}>CHANGER</button></div>
+          <div className="actions"><button className="btn" type="submit" disabled={busy} aria-busy={busy}>{busy ? 'CHANGEMENT…' : 'CHANGER'}</button></div>
         </form>
         )}
 
@@ -125,7 +125,7 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
             <span>TON PSEUDO</span>
             <input className="input" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={user.pseudo} autoComplete="off" required />
           </label>
-          <div className="actions"><button className="btn danger" type="submit" disabled={busy || !confirm}>SUPPRIMER MON COMPTE</button></div>
+          <div className="actions"><button className="btn danger" type="submit" disabled={busy || !confirm} aria-busy={busy}>{busy ? 'SUPPRESSION…' : 'SUPPRIMER MON COMPTE'}</button></div>
         </form>
       </div>
     </div>

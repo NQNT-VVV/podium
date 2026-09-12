@@ -100,7 +100,9 @@ export function AuthForm({ discord, passwordLogin, initialError }: { discord: bo
       {error && <div className="error" role="alert"><span>{error.toUpperCase()}</span></div>}
 
       <div className="actions">
-        <button className="btn primary lg" type="submit" disabled={busy}>{tab === 'login' ? 'SE CONNECTER' : 'CREER MON COMPTE'}</button>
+        <button className="btn primary lg" type="submit" disabled={busy} aria-busy={busy}>
+          {busy ? <>VERIFICATION<span className="loading-dots" aria-hidden="true"><span /><span /><span /></span></> : (tab === 'login' ? 'SE CONNECTER' : 'CREER MON COMPTE')}
+        </button>
         <span className="hint">
           {tab === 'login' ? 'Pas de compte ? Bascule sur « Creer un compte ».' : 'Aucune adresse demandee. Le pseudo est ta seule identite.'}
         </span>

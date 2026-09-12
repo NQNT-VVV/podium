@@ -56,6 +56,9 @@
    glisser. Sans elle l'interface ne repond pas, ce qui se lit comme « pas fini ». */
 --dur-tap:120ms;--ease-tap:steps(2,end);
 --tap:var(--dur-tap) var(--ease-tap);
+/* Duree d'une coupe a l'apparition : l'inversion pleine du systeme, puis la tenue.
+   Partagee par le message qui arrive et la valeur qui change. */
+--dur-cut:160ms;--cut:var(--dur-cut) var(--ease-hold);
 /* --- TEXTURES : dithering Bayer 4×4 (seuils 2/4/6/8/12 sur 16), hachures, grain --- */
 --dither-12:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");
 --dither-25:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 0h1v1H2zM0 2h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");

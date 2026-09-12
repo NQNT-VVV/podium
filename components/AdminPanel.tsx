@@ -59,7 +59,7 @@ function GameForm({ initial, onDone }: { initial: Partial<Game> | null; onDone: 
         <span className="hint">{'Ex. [{ "id": "daily", "label": "Musique du jour", "emoji": "🎵", "period": "daily", "metric": "best_score" }] — period : daily | weekly | none ; metric : wins, podiums, matches, points, best_score, score_sum.'}</span>
       </label>
       <div className="actions">
-        <button className="btn primary" type="submit" disabled={busy}>{isNew ? 'AJOUTER LE JEU' : 'ENREGISTRER'}</button>
+        <button className="btn primary" type="submit" disabled={busy} aria-busy={busy}>{busy ? 'ENVOI…' : (isNew ? 'AJOUTER LE JEU' : 'ENREGISTRER')}</button>
         <button className="btn ghost" type="button" onClick={onDone}>ANNULER</button>
       </div>
     </form>
@@ -115,7 +115,7 @@ function ChallengeForm({ games, metrics, onDone }: { games: Game[]; metrics: str
       </div>
       <label className="field"><span>DESCRIPTION</span><input className="input" value={f.description} onChange={(e) => set('description', e.target.value)} maxLength={500} /></label>
       <div className="actions">
-        <button className="btn primary" type="submit" disabled={busy}>CREER LE DEFI</button>
+        <button className="btn primary" type="submit" disabled={busy} aria-busy={busy}>{busy ? 'CREATION…' : 'CREER LE DEFI'}</button>
         <button className="btn ghost" type="button" onClick={onDone}>ANNULER</button>
       </div>
     </form>
