@@ -20,10 +20,10 @@ export default async function HomePage() {
           <span>HUB DE JEUX · V0.1</span>
           <span>SUJETS {hex(data.stats.users)}</span>
           <span>PARTIES CONSIGNEES {hex(data.stats.matches, 4)}</span>
-          <span>OFFICES EN COURS {hex(data.stats.activeChallenges)}</span>
+          <span>DEFIS EN COURS {hex(data.stats.activeChallenges)}</span>
         </div>
         <h1>PODIUM</h1>
-        <p>UN COMPTE, TOUS LES JEUX. CHAQUE PARTIE EST CONSIGNEE, COTEE, ET COMPTE POUR LA SAISON.</p>
+        <p>Un compte, tous les jeux. Chaque partie est consignee, cotee, et compte pour la saison.</p>
         {!me.user && (
           <div className="cta">
             <Link className="btn primary lg" href="/connexion">{me.providers.password ? 'CREER MON COMPTE' : 'SE CONNECTER AVEC DISCORD'}</Link>
@@ -40,7 +40,7 @@ export default async function HomePage() {
             <div className="head"><span>EMPLACEMENT LIBRE</span><span>0x00</span></div>
             <div>
               <h2>PROCHAIN JEU</h2>
-              <p className="tagline">LA PLATEFORME EST FAITE POUR EN ACCUEILLIR D’AUTRES. CHAQUE JEU ARRIVE AVEC SON CLASSEMENT ET SES OFFICES.</p>
+              <p className="tagline">La plateforme est faite pour en accueillir d’autres. Chaque jeu arrive avec son classement et ses defis.</p>
             </div>
             <div className="cta"><span className="meta">EN ATTENTE</span></div>
           </article>
@@ -49,7 +49,7 @@ export default async function HomePage() {
 
       {daily.length > 0 && (
         <section className="block">
-          <div className="block-head"><h2 className="section-title">0x02 · AUJOURD’HUI</h2><Link className="more" href="/defis">TOUS LES DEFIS</Link></div>
+          <div className="block-head"><h2 className="section-title">0x02 · Aujourd’hui</h2><Link className="more" href="/defis">TOUS LES DEFIS</Link></div>
           <div className="grid-3">{daily.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div>
         </section>
       )}
@@ -57,7 +57,7 @@ export default async function HomePage() {
       <div className="two-col">
         <section className="block">
           <div className="block-head"><h2 className="section-title">0x03 · CETTE SEMAINE</h2><Link className="more" href="/defis">TOUS LES DEFIS</Link></div>
-          {weekly.length ? <div className="grid-3">{weekly.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div> : <div className="empty"><span>LES OFFICES DE LA SEMAINE ARRIVENT</span></div>}
+          {weekly.length ? <div className="grid-3">{weekly.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div> : <div className="empty"><span>Les defis de la semaine arrivent.</span></div>}
         </section>
         <section className="block">
           <div className="block-head"><h2 className="section-title">0x04 · SAISON {data.season.label.toUpperCase()}</h2><Link className="more" href="/classement">COMPLET</Link></div>

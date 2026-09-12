@@ -9,8 +9,16 @@
 /* --- COULEUR : fond, os, sang, or. Les gris sont des opacités de l'os. --- */
 --bg:#060505;--ink:#D9D2C3;--accent:#E8362C;--accent-deep:#8E1B1B;--gold:#C99A2E;
 --ink-90:rgba(217,210,195,.9);--ink-60:rgba(217,210,195,.6);--ink-40:rgba(217,210,195,.4);--ink-25:rgba(217,210,195,.25);--ink-12:rgba(217,210,195,.12);--ink-06:rgba(217,210,195,.06);
+/* Deux paliers ajoutes a l'echelle d'origine, imposes par la perception et non par le gout :
+   .55 est le premier a atteindre 4.5:1 sur le fond (texte lisible), .45 le premier a atteindre
+   3:1 (element d'interface percevable). Sans eux, .40 sert de texte a 2.83:1 et .25 de bordure
+   a 1.75:1 : les filets disparaissent et l'interface perd toute structure. */
+--ink-55:rgba(217,210,195,.55);--ink-45:rgba(217,210,195,.45);
 /* --- BORDURE · RADIUS : une épaisseur, zéro arrondi --- */
---border:1px solid var(--ink-25);--border-strong:1px solid var(--ink);--border-live:1px solid var(--accent);--border-gold:1px solid var(--gold);--radius:0;
+/* --border sert de separateur interne (2.42:1, assume : il ordonne sans crier).
+   --border-ui habille tout ce qui se clique ou se saisit et tient le seuil de 3:1. */
+--border:1px solid var(--ink-35);--border-ui:1px solid var(--ink-45);--border-strong:1px solid var(--ink);--border-live:1px solid var(--accent);--border-gold:1px solid var(--gold);--radius:0;
+--ink-35:rgba(217,210,195,.35);
 /* --- TYPO : 2 polices, 6 niveaux, ratio 1.5 --- */
 --font-display:var(--font-archivo),'Archivo',ui-sans-serif,sans-serif;--font-mono:var(--font-departure),'Departure Mono','Courier New',ui-monospace,monospace;
 --fs-1:12px;--fs-2:18px;--fs-3:27px;--fs-4:40.5px;--fs-5:60.75px;--fs-6:clamp(60.75px,12vw,205.03px);
@@ -22,6 +30,11 @@
 --t-ui-l:var(--fs-3)/1.2 var(--font-mono);
 --t-ui:var(--fs-2)/1.2 var(--font-mono);
 --t-meta:var(--fs-1)/1.4 var(--font-mono);
+/* Niveau de lecture continue. Le systeme d'origine est une vitrine : ses six niveaux servent
+   des libelles courts, aucun ne porte un paragraphe. --t-prose comble ce manque, dans la meme
+   police et la meme famille de tailles, avec l'interlignage et la casse qu'exige un texte suivi. */
+--t-prose:14px/1.65 var(--font-mono);
+--ls-prose:.02em;
 /* --- ESPACEMENT : base 4, 10 pas --- */
 --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-6:24px;--sp-8:32px;--sp-12:48px;--sp-16:64px;--sp-24:96px;--sp-32:128px;
 --gutter:var(--sp-4);--margin:clamp(var(--sp-4),4vw,var(--sp-16));

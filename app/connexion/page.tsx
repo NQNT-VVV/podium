@@ -18,14 +18,14 @@ export default async function LoginPage({ searchParams }: Props) {
         <div>
           <div className="kicker"><span>PROCEDURE 0x01</span><span>OUVERTURE DE SESSION</span></div>
           <h1>IDENTIFICATION</h1>
-          <p>UN COMPTE TE SUIT DANS TOUS LES JEUX : TON PSEUDO EST RECONNU, TES PARTIES SONT CONSIGNEES, TES OFFICES SE CUMULENT.</p>
+          <p>Un compte te suit dans tous les jeux : ton pseudo est reconnu, tes parties sont consignees, tes defis se cumulent.</p>
         </div>
       </header>
       <AuthForm discord={me.providers.discord} passwordLogin={me.providers.password} initialError={sp.erreur} />
       <p className="meta">
         {me.providers.password
-          ? 'LE SYSTEME NE GARDE QU’UN PSEUDO, UN AVATAR ET UN MOT DE PASSE HACHE. RIEN D’AUTRE.'
-          : 'LE SYSTEME NE GARDE QUE L’IDENTIFIANT DISCORD, LE PSEUDO ET L’AVATAR. AUCUN ACCES AUX MESSAGES NI AUX SERVEURS.'}
+          ? 'Le systeme ne garde qu’un pseudo, un avatar et un mot de passe hache. Rien d’autre.'
+          : 'Le systeme ne garde que l’identifiant Discord, le pseudo et l’avatar. Aucun acces aux messages ni aux serveurs.'}
       </p>
     </main>
   );

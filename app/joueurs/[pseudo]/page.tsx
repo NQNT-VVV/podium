@@ -68,7 +68,7 @@ export default async function PlayerPage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <div className="empty"><span>AUCUNE PARTIE MULTIJOUEUR CLASSEE</span></div>
+          <div className="empty"><span>Aucune partie multijoueur classee.</span></div>
         )}
       </section>
 
@@ -89,7 +89,7 @@ export default async function PlayerPage({ params }: Props) {
               ))}
             </div>
           ) : (
-            <div className="empty"><span>PAS ENCORE DE BADGE · UN TOP 3 SUR UN OFFICE EN DONNE UN</span></div>
+            <div className="empty"><span>Pas encore de badge. Un top 3 sur un defi en donne un.</span></div>
           )}
         </section>
       </div>

@@ -32,8 +32,8 @@ export default async function LeaderboardPage({ searchParams }: Props) {
           <div className="kicker"><span>SECTION 0x02</span><span>SAISON MENSUELLE · COTE PERMANENTE</span></div>
           <h1>CLASSEMENT</h1>
           <p>
-            LA SAISON DURE UN MOIS : CHAQUE PARTIE MULTIJOUEUR RAPPORTE DE 10 A 110 POINTS SELON LA PLACE.
-            LA COTE ELO, ELLE, NE SE REMET JAMAIS A ZERO.
+            La saison dure un mois : chaque partie multijoueur rapporte de 10 a 110 points selon la place.
+            La cote Elo, elle, ne se remet jamais a zero.
           </p>
         </div>
       </header>
@@ -62,7 +62,7 @@ export default async function LeaderboardPage({ searchParams }: Props) {
       </section>
 
       <section className="block">
-        <div className="block-head"><h2 className="section-title">RANKED PAR JEU</h2></div>
+        <div className="block-head"><h2 className="section-title">CLASSEMENT PERMANENT PAR JEU</h2></div>
         <div className="grid-2">
           {data.games.map((g) => (
             <div className="card" key={g.slug}>

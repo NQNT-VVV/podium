@@ -15,11 +15,11 @@ export default async function ChallengesPage() {
     <main className="shell">
       <header className="page-head">
         <div>
-          <div className="kicker"><span>SECTION 0x03</span><span>OFFICES QUOTIDIENS ET HEBDOMADAIRES</span></div>
+          <div className="kicker"><span>SECTION 0x03</span><span>DEFIS QUOTIDIENS ET HEBDOMADAIRES</span></div>
           <h1>DEFIS</h1>
           <p>
-            CHAQUE SEMAINE, UN OFFICE PAR JEU ET UN OFFICE GLOBAL, TIRES AUTOMATIQUEMENT. CHAQUE JOUR, LES MODES
-            QUOTIDIENS. LES TROIS PREMIERS RECOIVENT UN BADGE A LA CLOTURE.
+            Chaque semaine, un defi par jeu et un defi global, tires automatiquement. Chaque jour, les modes
+            quotidiens. Les trois premiers recoivent un badge a la cloture.
           </p>
         </div>
       </header>
@@ -33,7 +33,7 @@ export default async function ChallengesPage() {
 
       <section className="block">
         <div className="block-head"><h2 className="section-title">CETTE SEMAINE</h2></div>
-        {others.length ? <div className="grid-3">{others.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div> : <div className="empty"><span>AUCUN OFFICE EN COURS</span></div>}
+        {others.length ? <div className="grid-3">{others.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div> : <div className="empty"><span>Aucun defi en cours.</span></div>}
       </section>
 
       {data.upcoming.length > 0 && (

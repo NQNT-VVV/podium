@@ -27,7 +27,7 @@ function GameForm({ initial, onDone }: { initial: Partial<Game> | null; onDone: 
       const body = { ...f, modes, sort: Number(f.sort) || 0 };
       if (isNew) await api('POST', '/api/admin/games', body);
       else await api('PATCH', `/api/admin/games/${f.slug}`, body);
-      toast(isNew ? 'JEU AJOUTE · OFFICES CREES' : 'JEU MIS A JOUR', 'ok');
+      toast(isNew ? 'JEU AJOUTE · DEFIS CREES' : 'JEU MIS A JOUR', 'ok');
       onDone();
     } catch (err) {
       toast((err as Error).message.toUpperCase(), 'err');
@@ -54,7 +54,7 @@ function GameForm({ initial, onDone }: { initial: Partial<Game> | null; onDone: 
       <label className="field"><span>ACCROCHE</span><input className="input" value={f.tagline} onChange={(e) => set('tagline', e.target.value)} maxLength={120} /></label>
       <label className="field"><span>DESCRIPTION</span><textarea className="input" value={f.description} onChange={(e) => set('description', e.target.value)} maxLength={1000} /></label>
       <label className="field">
-        <span>MODES (JSON) · UN OFFICE PAR PERIODE, AVEC SA GRAINE</span>
+        <span>MODES (JSON) · UN DEFI PAR PERIODE, AVEC SA GRAINE</span>
         <textarea className="input" value={f.modes} onChange={(e) => set('modes', e.target.value)} spellCheck={false} style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12.5, minHeight: 120 }} />
         <span className="hint">{'Ex. [{ "id": "daily", "label": "Musique du jour", "emoji": "🎵", "period": "daily", "metric": "best_score" }] — period : daily | weekly | none ; metric : wins, podiums, matches, points, best_score, score_sum.'}</span>
       </label>
@@ -79,7 +79,7 @@ function ChallengeForm({ games, metrics, onDone }: { games: Game[]; metrics: str
         ...f, gameSlug: f.gameSlug || null, mode: f.mode || null, period: 'custom',
         startsAt: f.startsAt ? new Date(f.startsAt).getTime() : undefined, endsAt: f.endsAt ? new Date(f.endsAt).getTime() : undefined,
       });
-      toast('OFFICE CREE', 'ok');
+      toast('DEFI CREE', 'ok');
       onDone();
     } catch (err) {
       toast((err as Error).message.toUpperCase(), 'err');
@@ -115,7 +115,7 @@ function ChallengeForm({ games, metrics, onDone }: { games: Game[]; metrics: str
       </div>
       <label className="field"><span>DESCRIPTION</span><input className="input" value={f.description} onChange={(e) => set('description', e.target.value)} maxLength={500} /></label>
       <div className="actions">
-        <button className="btn primary" type="submit" disabled={busy}>CREER L’OFFICE</button>
+        <button className="btn primary" type="submit" disabled={busy}>CREER LE DEFI</button>
         <button className="btn ghost" type="button" onClick={onDone}>ANNULER</button>
       </div>
     </form>
@@ -147,14 +147,14 @@ export function AdminPanel({ data }: { data: AdminOverview }) {
   }
 
   async function removeChallenge(c: Challenge) {
-    if (!confirm(`SUPPRIMER L’OFFICE « ${c.title.toUpperCase()} » ?`)) return;
-    try { await api('DELETE', `/api/admin/challenges/${c.id}`); toast('OFFICE SUPPRIME', 'ok'); refresh(); } catch (err) { toast((err as Error).message.toUpperCase(), 'err'); }
+    if (!confirm(`SUPPRIMER LE DEFI « ${c.title.toUpperCase()} » ?`)) return;
+    try { await api('DELETE', `/api/admin/challenges/${c.id}`); toast('DEFI SUPPRIME', 'ok'); refresh(); } catch (err) { toast((err as Error).message.toUpperCase(), 'err'); }
   }
 
   async function runScheduler() {
     try {
       const r = await api<{ created: number; closed: number }>('POST', '/api/admin/challenges/run');
-      toast(`${r.created} OFFICE(S) CREE(S) · ${r.closed} CLOS`, 'ok');
+      toast(`${r.created} DEFI(S) CREE(S) · ${r.closed} CLOS`, 'ok');
       router.refresh();
     } catch (err) {
       toast((err as Error).message.toUpperCase(), 'err');
@@ -200,9 +200,9 @@ export function AdminPanel({ data }: { data: AdminOverview }) {
 
       <section className="block">
         <div className="block-head">
-          <h2 className="section-title">OFFICES</h2>
+          <h2 className="section-title">DEFIS</h2>
           <button className="btn sm" type="button" onClick={runScheduler} title="Cree les defis manquants et clot ceux qui sont termines">LANCER LE PLANIFICATEUR</button>
-          <button className="btn sm primary" type="button" onClick={() => setCreatingChallenge(true)}>OFFICE EXCEPTIONNEL</button>
+          <button className="btn sm primary" type="button" onClick={() => setCreatingChallenge(true)}>DEFI EXCEPTIONNEL</button>
         </div>
         {creatingChallenge && <div className="card pad"><ChallengeForm games={data.games} metrics={data.metrics} onDone={refresh} /></div>}
         <div className="admin-list">
@@ -232,7 +232,7 @@ export function AdminPanel({ data }: { data: AdminOverview }) {
               </div>
             ))}
           </div>
-        ) : <div className="empty"><span>AUCUN RESULTAT RECU</span></div>}
+        ) : <div className="empty"><span>Aucun resultat recu pour l’instant.</span></div>}
       </section>
     </>
   );

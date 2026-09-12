@@ -6,7 +6,7 @@ import { Avatar } from './Avatar';
 import { Rank } from './Rank';
 
 export function SeasonTable({ rows, meId, showGames = true }: { rows: SeasonRow[]; meId?: string | null; showGames?: boolean }) {
-  if (!rows.length) return <div className="empty"><span>AUCUN POINT MARQUE CETTE SAISON</span></div>;
+  if (!rows.length) return <div className="empty"><span>Aucun point marque cette saison.</span></div>;
   return (
     <div className="table-wrap">
       <table className="table">

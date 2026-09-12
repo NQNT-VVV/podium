@@ -46,18 +46,18 @@ export default async function GamePage({ params }: Props) {
 
       {data.challenges.length > 0 && (
         <section className="block">
-          <div className="block-head"><h2 className="section-title">OFFICES EN COURS</h2><Link className="more" href="/defis">TOUS LES DEFIS</Link></div>
+          <div className="block-head"><h2 className="section-title">DEFIS EN COURS</h2><Link className="more" href="/defis">TOUS LES DEFIS</Link></div>
           <div className="grid-3">{data.challenges.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div>
         </section>
       )}
 
       <div className="two-col">
         <section className="block">
-          <div className="block-head"><h2 className="section-title">RANKED</h2></div>
+          <div className="block-head"><h2 className="section-title">CLASSEMENT PERMANENT</h2></div>
           <div className="card tight"><Ladder rows={data.ladder} meId={me.user?.id} /></div>
           <p className="meta" style={{ maxWidth: '64ch' }}>
-            COTE ELO MISE A JOUR A CHAQUE PARTIE MULTIJOUEUR. TROIS PARTIES DE PLACEMENT, PUIS BRONZE JUSQU’A LEGENDE.
-            LES JOUEURS SANS COMPTE APPARAISSENT DANS LES PARTIES MAIS NE SONT PAS CLASSES.
+            Cote Elo mise a jour a chaque partie multijoueur. Trois parties de placement, puis Bronze jusqu’a Legende.
+            Les joueurs sans compte apparaissent dans les parties mais ne sont pas classes.
           </p>
         </section>
         <section className="block">

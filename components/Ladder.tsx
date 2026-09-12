@@ -8,7 +8,7 @@ import { TierChip } from './TierChip';
 
 export function Ladder({ rows, meId, compact = false }: { rows: LadderRow[]; meId?: string | null; compact?: boolean }) {
   if (!rows.length) {
-    return <div className="empty"><span>AUCUNE PARTIE CLASSEE · LES TROIS PREMIERES SERVENT AU PLACEMENT</span></div>;
+    return <div className="empty"><span>Aucune partie classee. Les trois premieres servent au placement.</span></div>;
   }
   return (
     <div className="table-wrap">

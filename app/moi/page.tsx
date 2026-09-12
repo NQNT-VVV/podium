@@ -18,7 +18,7 @@ export default async function MePage({ searchParams }: Props) {
         <div>
           <div className="kicker"><span>PROCEDURE 0x02</span><span>FICHE DU SUJET</span></div>
           <h1>REGLAGES</h1>
-          <p>TON IDENTITE DANS TOUS LES JEUX, ET LA MANIERE DONT TU TE CONNECTES.</p>
+          <p>Ton identite dans tous les jeux, et la maniere dont tu te connectes.</p>
         </div>
       </header>
       {sp.discord === 'ok' && <div className="pill ok" style={{ alignSelf: 'flex-start' }}>DISCORD RATTACHE</div>}

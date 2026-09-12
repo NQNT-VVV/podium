@@ -11,7 +11,7 @@ function Name({ p }: { p: Match['players'][number] }) {
 }
 
 export function MatchList({ matches, withGame = true, mine = false }: { matches: Match[]; withGame?: boolean; mine?: boolean }) {
-  if (!matches.length) return <div className="empty"><span>AUCUNE PARTIE REMONTEE</span></div>;
+  if (!matches.length) return <div className="empty"><span>Aucune partie remontee pour l’instant.</span></div>;
   return (
     <div className="matches">
       {matches.map((m) => {

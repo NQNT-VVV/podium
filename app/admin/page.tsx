@@ -18,7 +18,7 @@ export default async function AdminPage() {
         <div>
           <div className="kicker"><span>SECTION 0x00</span><span>SYSTEME · ACCES RESTREINT</span></div>
           <h1>ADMINISTRATION</h1>
-          <p>CATALOGUE DES JEUX ET LEURS CLES D’INGESTION, OFFICES, JOURNAL DES RESULTATS RECUS. AJOUTER UN JEU ICI SUFFIT POUR QU’IL APPARAISSE PARTOUT AVEC SON CLASSEMENT ET SES OFFICES.</p>
+          <p>Catalogue des jeux et leurs cles d’ingestion, defis, journal des resultats recus. Ajouter un jeu ici suffit pour qu’il apparaisse partout avec son classement et ses defis.</p>
         </div>
       </header>
       <AdminPanel data={data} />

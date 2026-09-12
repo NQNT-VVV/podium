@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: data ? data.challenge.title : 'Defi inconnu' };
 }
 
-const PERIOD: Record<string, string> = { daily: 'OFFICE DU JOUR', weekly: 'OFFICE DE LA SEMAINE', custom: 'OFFICE EXCEPTIONNEL' };
+const PERIOD: Record<string, string> = { daily: 'DEFI DU JOUR', weekly: 'DEFI DE LA SEMAINE', custom: 'DEFI EXCEPTIONNEL' };
 
 export default async function ChallengePage({ params }: Props) {
   const { slug } = await params;
@@ -62,7 +62,7 @@ export default async function ChallengePage({ params }: Props) {
       )}
 
       <section className="block">
-        <div className="block-head"><h2 className="section-title">CLASSEMENT DE L’OFFICE</h2></div>
+        <div className="block-head"><h2 className="section-title">CLASSEMENT DU DEFI</h2></div>
         <div className="card tight">
           {c.board && c.board.length ? (
             <div className="table-wrap">
@@ -90,7 +90,7 @@ export default async function ChallengePage({ params }: Props) {
               </table>
             </div>
           ) : (
-            <div className="empty"><span>{c.state === 'upcoming' ? 'L’OFFICE N’A PAS COMMENCE' : 'PERSONNE N’A ENCORE MARQUE · LA PREMIERE PLACE EST LIBRE'}</span></div>
+            <div className="empty"><span>{c.state === 'upcoming' ? 'Le defi n’a pas encore commence.' : 'Personne n’a encore marque : la premiere place est libre.'}</span></div>
           )}
         </div>
       </section>

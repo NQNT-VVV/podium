@@ -49,11 +49,11 @@ export function AuthForm({ discord, passwordLogin, initialError }: { discord: bo
               SE CONNECTER AVEC DISCORD
             </a>
             <span className="hint">
-              UN COMPTE EST OUVERT A LA PREMIERE CONNEXION, AVEC LE NOM DISCORD COMME PSEUDO. MODIFIABLE ENSUITE.
+              Un compte est ouvert a la premiere connexion, avec le nom Discord comme pseudo. Modifiable ensuite.
             </span>
           </>
         ) : (
-          <div className="error" role="alert"><span>AUCUNE METHODE DE CONNEXION N’EST CONFIGUREE SUR CE NODE</span></div>
+          <div className="error" role="alert"><span>Aucune methode de connexion n’est configuree sur ce serveur.</span></div>
         )}
         {error && <div className="error" role="alert"><span>{error.toUpperCase()}</span></div>}
       </div>
@@ -102,7 +102,7 @@ export function AuthForm({ discord, passwordLogin, initialError }: { discord: bo
       <div className="actions">
         <button className="btn primary lg" type="submit" disabled={busy}>{tab === 'login' ? 'SE CONNECTER' : 'CREER MON COMPTE'}</button>
         <span className="hint">
-          {tab === 'login' ? 'PAS DE COMPTE ? BASCULE SUR « CREER UN COMPTE ».' : 'AUCUNE ADRESSE DEMANDEE. LE PSEUDO EST LA SEULE IDENTITE.'}
+          {tab === 'login' ? 'Pas de compte ? Bascule sur « Creer un compte ».' : 'Aucune adresse demandee. Le pseudo est ta seule identite.'}
         </span>
       </div>
     </form>

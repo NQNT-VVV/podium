@@ -68,7 +68,7 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
         <label className="field">
           <span>PSEUDO</span>
           <input className="input" value={pseudo} onChange={(e) => setPseudo(e.target.value)} required maxLength={20} />
-          <span className="hint">C’EST LUI QUE LES JEUX PRE-REMPLISSENT QUAND TU REJOINS UNE PARTIE.</span>
+          <span className="hint">C’est lui que les jeux pre-remplissent quand tu rejoins une partie.</span>
         </label>
         <div className="field">
           <span>AVATAR</span>
@@ -103,23 +103,23 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
           <div className="card pad form">
             <h2>DISCORD</h2>
             {linked
-              ? <p className="meta">COMPTE DISCORD RATTACHE · <b>{user.discordName}</b></p>
-              : <p className="meta">{password ? 'RATTACHE TON DISCORD POUR TE CONNECTER SANS MOT DE PASSE.' : 'RATTACHE TON DISCORD POUR GARDER CE COMPTE : C’EST DESORMAIS LA SEULE FACON DE SE CONNECTER.'}</p>}
+              ? <p className="meta" style={{ textTransform: 'none' }}>Compte Discord rattache : <b>{user.discordName}</b></p>
+              : <p className="meta" style={{ textTransform: 'none' }}>{password ? 'Rattache ton Discord pour te connecter sans mot de passe.' : 'Rattache ton Discord pour garder ce compte : c’est desormais la seule facon de se connecter.'}</p>}
             {!linked && <div className="actions"><a className="btn discord" href="/api/auth/discord">RATTACHER DISCORD</a></div>}
           </div>
         )}
 
         <div className="card pad form">
           <h2>MES DONNEES</h2>
-          <p className="meta">TOUT CE QUE LE SYSTEME SAIT DE TOI, EN UN FICHIER JSON : COMPTE, COTES, BADGES, PARTIES.</p>
+          <p className="meta" style={{ textTransform: 'none' }}>Tout ce que le systeme sait de toi, en un fichier JSON : compte, cotes, badges, parties.</p>
           <div className="actions"><a className="btn" href="/api/auth/export">TELECHARGER MES DONNEES</a></div>
         </div>
 
         <form className="card pad form danger-zone" onSubmit={deleteAccount}>
           <h2>PARTIR</h2>
-          <p className="meta">
-            SUPPRESSION IMMEDIATE ET DEFINITIVE : COMPTE, SESSIONS, COTES ET BADGES. TES PARTIES RESTENT DANS
-            L’HISTORIQUE DES AUTRES, SOUS « JOUEUR PARTI ». RETAPE TON PSEUDO POUR CONFIRMER.
+          <p className="meta" style={{ textTransform: 'none' }}>
+            Suppression immediate et definitive : compte, sessions, cotes et badges. Tes parties restent dans
+            l’historique des autres, sous « Joueur parti ». Retape ton pseudo pour confirmer.
           </p>
           <label className="field">
             <span>TON PSEUDO</span>

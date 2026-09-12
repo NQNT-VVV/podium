@@ -6,7 +6,7 @@ import { hex } from '@/lib/hex';
 import { Avatar } from './Avatar';
 import { Countdown } from './Countdown';
 
-const PERIOD: Record<string, string> = { daily: 'OFFICE DU JOUR', weekly: 'OFFICE DE LA SEMAINE', custom: 'OFFICE EXCEPTIONNEL' };
+const PERIOD: Record<string, string> = { daily: 'DEFI DU JOUR', weekly: 'DEFI DE LA SEMAINE', custom: 'DEFI EXCEPTIONNEL' };
 
 export function ChallengeCard({ challenge: c, showBoard = true }: { challenge: Challenge; showBoard?: boolean }) {
   const playUrl = c.kind === 'mode' && c.game?.url ? `${c.game.url}/${c.mode}` : null;
@@ -39,7 +39,7 @@ export function ChallengeCard({ challenge: c, showBoard = true }: { challenge: C
         </div>
       )}
       {showBoard && c.board && c.board.length === 0 && c.state === 'active' && (
-        <div className="board"><div className="row empty-row">PERSONNE ENCORE · LA PREMIERE PLACE EST LIBRE</div></div>
+        <div className="board"><div className="row empty-row">Personne encore : la premiere place est libre.</div></div>
       )}
       {c.winners && c.winners.length > 0 && (
         <div className="board">
