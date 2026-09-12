@@ -5,6 +5,7 @@ import { GameCard } from '@/components/GameCard';
 import { MatchList } from '@/components/MatchList';
 import { SeasonTable } from '@/components/SeasonTable';
 import { apiGet } from '@/lib/api';
+import { hex } from '@/lib/hex';
 import type { AuthMe, HomeData } from '@/lib/types';
 
 export default async function HomePage() {
@@ -15,49 +16,57 @@ export default async function HomePage() {
   return (
     <main className="shell">
       <header className="hero">
-        <span className="pill"><span className="dot" /> {data.stats.users} joueur{data.stats.users > 1 ? 's' : ''} · {data.stats.matchesWeek} partie{data.stats.matchesWeek > 1 ? 's' : ''} cette semaine</span>
-        <h1>Podium</h1>
-        <p>Un compte, tous les jeux. Chaque partie compte pour ta cote, la saison en cours et les defis de la semaine.</p>
+        <div className="meta-line">
+          <span>HUB DE JEUX · V0.1</span>
+          <span>SUJETS {hex(data.stats.users)}</span>
+          <span>PARTIES CONSIGNEES {hex(data.stats.matches, 4)}</span>
+          <span>OFFICES EN COURS {hex(data.stats.activeChallenges)}</span>
+        </div>
+        <h1>PODIUM</h1>
+        <p>UN COMPTE, TOUS LES JEUX. CHAQUE PARTIE EST CONSIGNEE, COTEE, ET COMPTE POUR LA SAISON.</p>
         {!me.user && (
-          <div className="row wrap" style={{ justifyContent: 'center' }}>
-            <Link className="btn primary lg" href="/connexion">{me.providers.password ? 'Creer mon compte' : 'Se connecter avec Discord'}</Link>
-            <Link className="btn lg" href="/classement">Voir le classement</Link>
+          <div className="cta">
+            <Link className="btn primary lg" href="/connexion">{me.providers.password ? 'CREER MON COMPTE' : 'SE CONNECTER AVEC DISCORD'}</Link>
+            <Link className="btn lg" href="/classement">VOIR LE CLASSEMENT</Link>
           </div>
         )}
       </header>
 
       <section className="block">
-        <div className="block-head"><h2 className="section-title">Les jeux</h2></div>
+        <div className="block-head"><h2 className="section-title">0x01 · LES JEUX</h2></div>
         <div className="grid-2">
           {data.games.map((g) => <GameCard key={g.slug} game={g} />)}
-          <article className="card game-card soon" style={{ ['--brand' as string]: '#6b6690', justifyContent: 'center', alignItems: 'center', textAlign: 'center', minHeight: 200 }}>
-            <span className="icon" aria-hidden="true">✨</span>
-            <h2 style={{ fontSize: 20 }}>Prochain jeu</h2>
-            <p className="tagline">La plateforme est faite pour en accueillir d’autres. Chaque nouveau jeu arrive avec son classement et ses defis.</p>
+          <article className="card game-card soon">
+            <div className="head"><span>EMPLACEMENT LIBRE</span><span>0x00</span></div>
+            <div>
+              <h2>PROCHAIN JEU</h2>
+              <p className="tagline">LA PLATEFORME EST FAITE POUR EN ACCUEILLIR D’AUTRES. CHAQUE JEU ARRIVE AVEC SON CLASSEMENT ET SES OFFICES.</p>
+            </div>
+            <div className="cta"><span className="meta">EN ATTENTE</span></div>
           </article>
         </div>
       </section>
 
       {daily.length > 0 && (
         <section className="block">
-          <div className="block-head"><h2 className="section-title">Aujourd’hui</h2><Link className="more" href="/defis">Tous les defis →</Link></div>
+          <div className="block-head"><h2 className="section-title">0x02 · AUJOURD’HUI</h2><Link className="more" href="/defis">TOUS LES DEFIS</Link></div>
           <div className="grid-3">{daily.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div>
         </section>
       )}
 
       <div className="two-col">
         <section className="block">
-          <div className="block-head"><h2 className="section-title">Defis de la semaine</h2><Link className="more" href="/defis">Tous les defis →</Link></div>
-          {weekly.length ? <div className="grid-3">{weekly.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div> : <div className="empty">Les defis de la semaine arrivent.</div>}
+          <div className="block-head"><h2 className="section-title">0x03 · CETTE SEMAINE</h2><Link className="more" href="/defis">TOUS LES DEFIS</Link></div>
+          {weekly.length ? <div className="grid-3">{weekly.map((c) => <ChallengeCard key={c.id} challenge={c} />)}</div> : <div className="empty"><span>LES OFFICES DE LA SEMAINE ARRIVENT</span></div>}
         </section>
         <section className="block">
-          <div className="block-head"><h2 className="section-title">Saison · {data.season.label}</h2><Link className="more" href="/classement">Classement complet →</Link></div>
+          <div className="block-head"><h2 className="section-title">0x04 · SAISON {data.season.label.toUpperCase()}</h2><Link className="more" href="/classement">COMPLET</Link></div>
           <div className="card tight"><SeasonTable rows={data.season.rows} meId={me.user?.id} /></div>
         </section>
       </div>
 
       <section className="block">
-        <div className="block-head"><h2 className="section-title">Dernieres parties</h2></div>
+        <div className="block-head"><h2 className="section-title">0x05 · JOURNAL DES PARTIES</h2></div>
         <MatchList matches={data.matches} />
       </section>
     </main>

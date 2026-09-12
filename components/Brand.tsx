@@ -5,7 +5,7 @@ export function Brand({ compact = false, href = '/' as string | null }) {
     <>
       <span className="brand-mark" aria-hidden="true">🏆</span>
       {!compact && <span className="brand-name">Podium</span>}
-      <span className="brand-beta">beta</span>
+      <span className="brand-beta">V0.1 · Beta</span>
     </>
   );
   if (!href) return <span className="brand">{content}</span>;

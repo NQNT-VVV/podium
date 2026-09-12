@@ -22,10 +22,10 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
     setBusy(true);
     try {
       await api('PATCH', '/api/auth/me', { pseudo, avatar });
-      toast('Profil enregistre. Les jeux le verront a ta prochaine partie.', 'ok');
+      toast('PROFIL ENREGISTRE · LES JEUX LE VERRONT A LA PROCHAINE PARTIE', 'ok');
       router.refresh();
     } catch (err) {
-      toast((err as Error).message, 'err');
+      toast((err as Error).message.toUpperCase(), 'err');
     } finally {
       setBusy(false);
     }
@@ -36,10 +36,10 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
     setBusy(true);
     try {
       await api('POST', '/api/auth/password', { current, next });
-      toast('Mot de passe change.', 'ok');
+      toast('MOT DE PASSE CHANGE', 'ok');
       setCurrent(''); setNext('');
     } catch (err) {
-      toast((err as Error).message, 'err');
+      toast((err as Error).message.toUpperCase(), 'err');
     } finally {
       setBusy(false);
     }
@@ -47,15 +47,15 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
 
   async function deleteAccount(e: React.FormEvent) {
     e.preventDefault();
-    if (!window.confirm('Supprimer definitivement ton compte ? Cotes, badges et sessions disparaissent, tes parties deviennent anonymes.')) return;
+    if (!window.confirm('SUPPRIMER DEFINITIVEMENT TON COMPTE ? COTES, BADGES ET SESSIONS DISPARAISSENT, TES PARTIES DEVIENNENT ANONYMES.')) return;
     setBusy(true);
     try {
       await api('DELETE', '/api/auth/me', { confirm });
-      toast('Compte supprime. Merci d’avoir joue.', 'ok');
+      toast('COMPTE SUPPRIME · FICHE EFFACEE', 'ok');
       router.push('/');
       router.refresh();
     } catch (err) {
-      toast((err as Error).message, 'err');
+      toast((err as Error).message.toUpperCase(), 'err');
     } finally {
       setBusy(false);
     }
@@ -64,70 +64,68 @@ export function ProfileSettings({ user, discord, password, linked }: { user: Me;
   return (
     <div className="grid-2" style={{ alignItems: 'start' }}>
       <form className="card pad form" onSubmit={saveProfile}>
-        <h2 style={{ fontSize: 20 }}>Identite</h2>
+        <h2>IDENTITE</h2>
         <label className="field">
-          <span>Pseudo</span>
+          <span>PSEUDO</span>
           <input className="input" value={pseudo} onChange={(e) => setPseudo(e.target.value)} required maxLength={20} />
-          <span className="hint">C’est lui que les jeux pre-remplissent quand tu rejoins une partie.</span>
+          <span className="hint">C’EST LUI QUE LES JEUX PRE-REMPLISSENT QUAND TU REJOINS UNE PARTIE.</span>
         </label>
         <div className="field">
-          <span>Avatar</span>
+          <span>AVATAR</span>
           <div className="emoji-grid">
             {AVATARS.map((e) => (
               <button type="button" key={e} aria-pressed={avatar === e} onClick={() => setAvatar(e)} aria-label={e}>{e}</button>
             ))}
           </div>
         </div>
-        <div className="actions"><button className="btn primary" type="submit" disabled={busy}>Enregistrer</button></div>
+        <div className="actions"><button className="btn primary" type="submit" disabled={busy}>ENREGISTRER</button></div>
       </form>
 
       <div className="col" style={{ gap: 20 }}>
         {password && (
         <form className="card pad form" onSubmit={savePassword}>
-          <h2 style={{ fontSize: 20 }}>{user.hasPassword ? 'Mot de passe' : 'Definir un mot de passe'}</h2>
+          <h2>{user.hasPassword ? 'MOT DE PASSE' : 'DEFINIR UN MOT DE PASSE'}</h2>
           {user.hasPassword && (
             <label className="field">
-              <span>Actuel</span>
+              <span>ACTUEL</span>
               <input className="input" type="password" value={current} onChange={(e) => setCurrent(e.target.value)} autoComplete="current-password" required />
             </label>
           )}
           <label className="field">
-            <span>Nouveau</span>
+            <span>NOUVEAU</span>
             <input className="input" type="password" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" required minLength={6} />
           </label>
-          <div className="actions"><button className="btn" type="submit" disabled={busy}>Changer</button></div>
+          <div className="actions"><button className="btn" type="submit" disabled={busy}>CHANGER</button></div>
         </form>
         )}
 
         {discord && (
           <div className="card pad form">
-            <h2 style={{ fontSize: 20 }}>Discord</h2>
+            <h2>DISCORD</h2>
             {linked
-              ? <p className="muted" style={{ fontSize: 14 }}>Compte Discord rattache : <b>{user.discordName}</b>. Tu peux te connecter en un clic.</p>
-              : <p className="muted" style={{ fontSize: 14 }}>{password ? 'Rattache ton Discord pour te connecter sans mot de passe.' : 'Rattache ton Discord pour garder ce compte : c’est desormais la seule facon de se connecter.'}</p>}
-            {!linked && <div className="actions"><a className="btn discord" href="/api/auth/discord">Rattacher Discord</a></div>}
+              ? <p className="meta">COMPTE DISCORD RATTACHE · <b>{user.discordName}</b></p>
+              : <p className="meta">{password ? 'RATTACHE TON DISCORD POUR TE CONNECTER SANS MOT DE PASSE.' : 'RATTACHE TON DISCORD POUR GARDER CE COMPTE : C’EST DESORMAIS LA SEULE FACON DE SE CONNECTER.'}</p>}
+            {!linked && <div className="actions"><a className="btn discord" href="/api/auth/discord">RATTACHER DISCORD</a></div>}
           </div>
         )}
 
         <div className="card pad form">
-          <h2 style={{ fontSize: 20 }}>Mes donnees</h2>
-          <p className="muted" style={{ fontSize: 14 }}>
-            Tout ce que Podium sait de toi, en un fichier JSON : compte, cotes, badges, parties.
-          </p>
-          <div className="actions"><a className="btn" href="/api/auth/export">Telecharger mes donnees</a></div>
+          <h2>MES DONNEES</h2>
+          <p className="meta">TOUT CE QUE LE SYSTEME SAIT DE TOI, EN UN FICHIER JSON : COMPTE, COTES, BADGES, PARTIES.</p>
+          <div className="actions"><a className="btn" href="/api/auth/export">TELECHARGER MES DONNEES</a></div>
         </div>
 
         <form className="card pad form danger-zone" onSubmit={deleteAccount}>
-          <h2 style={{ fontSize: 20 }}>Partir</h2>
-          <p className="muted" style={{ fontSize: 14 }}>
-            Suppression immediate et definitive : compte, sessions, cotes et badges. Tes parties restent dans
-            l’historique des autres, sous « Joueur parti ». Retape ton pseudo pour confirmer.
+          <h2>PARTIR</h2>
+          <p className="meta">
+            SUPPRESSION IMMEDIATE ET DEFINITIVE : COMPTE, SESSIONS, COTES ET BADGES. TES PARTIES RESTENT DANS
+            L’HISTORIQUE DES AUTRES, SOUS « JOUEUR PARTI ». RETAPE TON PSEUDO POUR CONFIRMER.
           </p>
           <label className="field">
-            <span>Ton pseudo</span>
+            <span>TON PSEUDO</span>
             <input className="input" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={user.pseudo} autoComplete="off" required />
           </label>
-          <div className="actions"><button className="btn danger" type="submit" disabled={busy || !confirm}>Supprimer mon compte</button></div>
+          <div className="actions"><button className="btn danger" type="submit" disabled={busy || !confirm}>SUPPRIMER MON COMPTE</button></div>
         </form>
       </div>
     </div>

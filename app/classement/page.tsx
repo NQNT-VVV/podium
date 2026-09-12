@@ -29,27 +29,31 @@ export default async function LeaderboardPage({ searchParams }: Props) {
     <main className="shell">
       <header className="page-head">
         <div>
-          <h1>Classement</h1>
-          <p>La saison dure un mois : chaque partie multijoueur rapporte de 10 a 110 points selon la place. La cote Elo, elle, ne se remet jamais a zero.</p>
+          <div className="kicker"><span>SECTION 0x02</span><span>SAISON MENSUELLE · COTE PERMANENTE</span></div>
+          <h1>CLASSEMENT</h1>
+          <p>
+            LA SAISON DURE UN MOIS : CHAQUE PARTIE MULTIJOUEUR RAPPORTE DE 10 A 110 POINTS SELON LA PLACE.
+            LA COTE ELO, ELLE, NE SE REMET JAMAIS A ZERO.
+          </p>
         </div>
       </header>
 
       <section className="block">
         <div className="block-head">
-          <h2 className="section-title">Saison · {data.season.label}{data.season.current ? '' : ' (terminee)'}</h2>
+          <h2 className="section-title">SAISON {data.season.label.toUpperCase()}{data.season.current ? '' : ' · CLOSE'}</h2>
         </div>
-        <div className="row wrap" style={{ gap: 8 }}>
+        <div className="row wrap">
           <div className="seg">
-            <Link href={link(data.season.key)} className="btn xs ghost" aria-pressed={!data.game} style={{ borderRadius: 999 }}>Tous les jeux</Link>
+            <Link href={link(data.season.key)} aria-pressed={!data.game}>TOUS LES JEUX</Link>
             {data.games.map((g) => (
-              <Link key={g.slug} href={link(data.season.key, g.slug)} className="btn xs ghost" aria-pressed={data.game?.slug === g.slug} style={{ borderRadius: 999 }}>{g.emoji} {g.name}</Link>
+              <Link key={g.slug} href={link(data.season.key, g.slug)} aria-pressed={data.game?.slug === g.slug}>{g.name.toUpperCase()}</Link>
             ))}
           </div>
           <span className="grow" />
           {data.seasons.length > 1 && (
             <div className="seg">
               {data.seasons.map((s) => (
-                <Link key={s.key} href={link(s.key, data.game?.slug)} className="btn xs ghost" aria-pressed={s.key === data.season.key} style={{ borderRadius: 999 }}>{s.label}</Link>
+                <Link key={s.key} href={link(s.key, data.game?.slug)} aria-pressed={s.key === data.season.key}>{s.label.toUpperCase()}</Link>
               ))}
             </div>
           )}
@@ -58,17 +62,16 @@ export default async function LeaderboardPage({ searchParams }: Props) {
       </section>
 
       <section className="block">
-        <div className="block-head"><h2 className="section-title">Ranked par jeu</h2></div>
+        <div className="block-head"><h2 className="section-title">RANKED PAR JEU</h2></div>
         <div className="grid-2">
           {data.games.map((g) => (
-            <div className="card" key={g.slug} style={{ overflow: 'hidden' }}>
-              <div className="row" style={{ padding: '14px 16px 6px' }}>
-                <span style={{ fontSize: 22 }} aria-hidden="true">{g.emoji}</span>
-                <b style={{ fontFamily: 'var(--display)', fontSize: 17 }}>{g.name}</b>
+            <div className="card" key={g.slug}>
+              <div className="row" style={{ padding: 'var(--sp-3) var(--sp-3) 0' }}>
+                <b style={{ font: 'var(--t-ui)', letterSpacing: 'var(--ls-mono)' }}>{g.name.toUpperCase()}</b>
                 <span className="grow" />
-                <Link className="more" href={`/jeux/${g.slug}`} style={{ fontSize: 13, color: 'var(--muted)', fontWeight: 600 }}>Voir le jeu →</Link>
+                <Link className="meta" href={`/jeux/${g.slug}`}>VOIR LE JEU</Link>
               </div>
-              <div style={{ padding: '0 6px 6px' }}><Ladder rows={g.ladder} meId={me.user?.id} compact /></div>
+              <Ladder rows={g.ladder} meId={me.user?.id} compact />
             </div>
           ))}
         </div>

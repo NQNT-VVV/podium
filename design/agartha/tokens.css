@@ -1,0 +1,43 @@
+/* ==========================================================================
+   AGARTHA · SYSTEME DE DESIGN · V0.4.0 « LITURGIE » — JETONS
+   Copie conforme du design system. La seule source de valeurs : tout ce qui
+   n'est pas ici est une faute. Les deux familles de polices sont fournies par
+   next/font (variables --font-archivo et --font-departure) et servies par
+   notre propre serveur.
+   ========================================================================== */
+:root{
+/* --- COULEUR : fond, os, sang, or. Les gris sont des opacités de l'os. --- */
+--bg:#060505;--ink:#D9D2C3;--accent:#E8362C;--accent-deep:#8E1B1B;--gold:#C99A2E;
+--ink-90:rgba(217,210,195,.9);--ink-60:rgba(217,210,195,.6);--ink-40:rgba(217,210,195,.4);--ink-25:rgba(217,210,195,.25);--ink-12:rgba(217,210,195,.12);--ink-06:rgba(217,210,195,.06);
+/* --- BORDURE · RADIUS : une épaisseur, zéro arrondi --- */
+--border:1px solid var(--ink-25);--border-strong:1px solid var(--ink);--border-live:1px solid var(--accent);--border-gold:1px solid var(--gold);--radius:0;
+/* --- TYPO : 2 polices, 6 niveaux, ratio 1.5 --- */
+--font-display:var(--font-archivo),'Archivo',ui-sans-serif,sans-serif;--font-mono:var(--font-departure),'Departure Mono','Courier New',ui-monospace,monospace;
+--fs-1:12px;--fs-2:18px;--fs-3:27px;--fs-4:40.5px;--fs-5:60.75px;--fs-6:clamp(60.75px,12vw,205.03px);
+--ls-display:-.04em;--ls-mono:.08em;
+--t-display:900 expanded var(--fs-6)/.9 var(--font-display);
+--t-h1:900 expanded var(--fs-4)/.95 var(--font-display);
+--t-h2:800 expanded var(--fs-3)/1 var(--font-display);
+--t-data:var(--fs-5)/1 var(--font-mono);
+--t-ui-l:var(--fs-3)/1.2 var(--font-mono);
+--t-ui:var(--fs-2)/1.2 var(--font-mono);
+--t-meta:var(--fs-1)/1.4 var(--font-mono);
+/* --- ESPACEMENT : base 4, 10 pas --- */
+--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-6:24px;--sp-8:32px;--sp-12:48px;--sp-16:64px;--sp-24:96px;--sp-32:128px;
+--gutter:var(--sp-4);--margin:clamp(var(--sp-4),4vw,var(--sp-16));
+/* --- MOTION : coupes sèches --- */
+--dur-0:0ms;--dur-flash:80ms;--dur-blink:600ms;--ease-cut:steps(3,end);--ease-hold:steps(1,end);
+/* --- TEXTURES : dithering Bayer 4×4 (seuils 2/4/6/8/12 sur 16), hachures, grain --- */
+--dither-12:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");
+--dither-25:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 0h1v1H2zM0 2h1v1H0zM2 2h1v1H2z'/%3E%3C/svg%3E");
+--dither-37:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 0h1v1H2zM0 2h1v1H0zM2 2h1v1H2zM1 1h1v1H1zM3 3h1v1H3z'/%3E%3C/svg%3E");
+--dither-50:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 0h1v1H2zM0 2h1v1H0zM2 2h1v1H2zM1 1h1v1H1zM3 3h1v1H3zM3 1h1v1H3zM1 3h1v1H1z'/%3E%3C/svg%3E");
+--dither-75:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23D9D2C3' d='M0 0h1v1H0zM2 0h1v1H2zM0 2h1v1H0zM2 2h1v1H2zM1 1h1v1H1zM3 3h1v1H3zM3 1h1v1H3zM1 3h1v1H1zM1 0h1v1H1zM3 0h1v1H3zM3 2h1v1H3zM1 2h1v1H1z'/%3E%3C/svg%3E");
+--dither-size:8px 8px;
+--hatch:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M-1 1l2-2M0 8L8 0M7 9l2-2' stroke='%23D9D2C3' stroke-opacity='.6' fill='none'/%3E%3C/svg%3E");
+--hatch-gold:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M-1 1l2-2M0 8L8 0M7 9l2-2' stroke='%23C99A2E' fill='none'/%3E%3C/svg%3E");
+--rule:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath d='M0 3.5h4' stroke='%23D9D2C3' stroke-opacity='.12'/%3E%3C/svg%3E");
+--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23g)'/%3E%3C/svg%3E");
+--veil:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23060505' d='M0 0h1v1H0zM2 0h1v1H2zM0 2h1v1H0zM2 2h1v1H2zM1 1h1v1H1zM3 3h1v1H3zM3 1h1v1H3zM1 3h1v1H1zM1 0h1v1H1zM3 0h1v1H3zM3 2h1v1H3zM1 2h1v1H1z'/%3E%3C/svg%3E");
+--grid8:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 7.5h8M7.5 0v8' stroke='%23E8362C' stroke-opacity='.2'/%3E%3C/svg%3E");
+}

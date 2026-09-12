@@ -29,7 +29,7 @@ export function AuthForm({ discord, passwordLogin, initialError }: { discord: bo
     try {
       const path = tab === 'login' ? '/api/auth/login' : '/api/auth/register';
       const { user } = await api<{ user: Me }>('POST', path, { pseudo, password, avatar });
-      toast(tab === 'login' ? `Content de te revoir, ${user.pseudo} !` : `Bienvenue, ${user.pseudo} !`, 'ok');
+      toast(tab === 'login' ? `SESSION OUVERTE · ${user.pseudo.toUpperCase()}` : `SUJET ENREGISTRE · ${user.pseudo.toUpperCase()}`, 'ok');
       router.push(tab === 'login' ? '/' : `/joueurs/${encodeURIComponent(user.pseudo)}`);
       router.refresh();
     } catch (err) {
@@ -46,16 +46,16 @@ export function AuthForm({ discord, passwordLogin, initialError }: { discord: bo
           <>
             <a className="btn discord block lg" href="/api/auth/discord">
               <DiscordMark />
-              Se connecter avec Discord
+              SE CONNECTER AVEC DISCORD
             </a>
-            <span className="hint" style={{ textAlign: 'center' }}>
-              Un compte Podium est cree a ta premiere connexion, avec ton nom Discord comme pseudo. Modifiable ensuite.
+            <span className="hint">
+              UN COMPTE EST OUVERT A LA PREMIERE CONNEXION, AVEC LE NOM DISCORD COMME PSEUDO. MODIFIABLE ENSUITE.
             </span>
           </>
         ) : (
-          <div className="error" role="alert">Aucune methode de connexion n’est configuree sur ce serveur.</div>
+          <div className="error" role="alert"><span>AUCUNE METHODE DE CONNEXION N’EST CONFIGUREE SUR CE NODE</span></div>
         )}
-        {error && <div className="error" role="alert">{error}</div>}
+        {error && <div className="error" role="alert"><span>{error.toUpperCase()}</span></div>}
       </div>
     );
   }
@@ -63,32 +63,32 @@ export function AuthForm({ discord, passwordLogin, initialError }: { discord: bo
   return (
     <form className="card pad form" onSubmit={submit}>
       <div className="tabs" role="tablist">
-        <button type="button" role="tab" aria-selected={tab === 'login'} onClick={() => setTab('login')}>Connexion</button>
-        <button type="button" role="tab" aria-selected={tab === 'register'} onClick={() => setTab('register')}>Creer un compte</button>
+        <button type="button" role="tab" aria-selected={tab === 'login'} onClick={() => setTab('login')}>CONNEXION</button>
+        <button type="button" role="tab" aria-selected={tab === 'register'} onClick={() => setTab('register')}>CREER UN COMPTE</button>
       </div>
 
       {discord && (
         <>
           <a className="btn discord block" href="/api/auth/discord">
             <DiscordMark />
-            Continuer avec Discord
+            CONTINUER AVEC DISCORD
           </a>
-          <div className="divider">ou avec un pseudo</div>
+          <div className="divider">OU AVEC UN PSEUDO</div>
         </>
       )}
 
       <label className="field">
-        <span>Pseudo</span>
-        <input className="input" value={pseudo} onChange={(e) => setPseudo(e.target.value)} autoComplete="username" required maxLength={20} placeholder="Le meme que dans les jeux, idealement" />
+        <span>PSEUDO</span>
+        <input className="input" value={pseudo} onChange={(e) => setPseudo(e.target.value)} autoComplete="username" required maxLength={20} placeholder="LE MEME QUE DANS LES JEUX" />
       </label>
       <label className="field">
-        <span>Mot de passe</span>
+        <span>MOT DE PASSE</span>
         <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={tab === 'login' ? 'current-password' : 'new-password'} required minLength={6} />
       </label>
 
       {tab === 'register' && (
         <div className="field">
-          <span>Avatar</span>
+          <span>AVATAR</span>
           <div className="emoji-grid">
             {AVATARS.map((e) => (
               <button type="button" key={e} aria-pressed={avatar === e} onClick={() => setAvatar(e)} aria-label={e}>{e}</button>
@@ -97,12 +97,12 @@ export function AuthForm({ discord, passwordLogin, initialError }: { discord: bo
         </div>
       )}
 
-      {error && <div className="error" role="alert">{error}</div>}
+      {error && <div className="error" role="alert"><span>{error.toUpperCase()}</span></div>}
 
       <div className="actions">
-        <button className="btn primary lg" type="submit" disabled={busy}>{tab === 'login' ? 'Se connecter' : 'Creer mon compte'}</button>
+        <button className="btn primary lg" type="submit" disabled={busy}>{tab === 'login' ? 'SE CONNECTER' : 'CREER MON COMPTE'}</button>
         <span className="hint">
-          {tab === 'login' ? 'Pas encore de compte ? Bascule sur « Creer un compte ».' : 'Aucune adresse e-mail demandee. Le pseudo est ta seule identite.'}
+          {tab === 'login' ? 'PAS DE COMPTE ? BASCULE SUR « CREER UN COMPTE ».' : 'AUCUNE ADRESSE DEMANDEE. LE PSEUDO EST LA SEULE IDENTITE.'}
         </span>
       </div>
     </form>

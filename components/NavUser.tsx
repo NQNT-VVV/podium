@@ -24,12 +24,12 @@ export function NavUser({ user }: { user: Me }) {
   async function logout() {
     try {
       await api('POST', '/api/auth/logout');
-      toast('A bientot !', 'ok');
+      toast('SESSION CLOSE', 'ok');
       setOpen(false);
       router.push('/');
       router.refresh();
     } catch (err) {
-      toast((err as Error).message, 'err');
+      toast((err as Error).message.toUpperCase(), 'err');
     }
   }
 
@@ -41,11 +41,10 @@ export function NavUser({ user }: { user: Me }) {
       </button>
       {open && (
         <div className="nav-menu" role="menu">
-          <Link href={`/joueurs/${encodeURIComponent(user.pseudo)}`} onClick={() => setOpen(false)}>👤 Mon profil</Link>
-          <Link href="/moi" onClick={() => setOpen(false)}>⚙️ Reglages</Link>
-          {user.role === 'admin' && <Link href="/admin" onClick={() => setOpen(false)}>🛠️ Administration</Link>}
-          <hr />
-          <button type="button" onClick={logout}>🚪 Se deconnecter</button>
+          <Link href={`/joueurs/${encodeURIComponent(user.pseudo)}`} onClick={() => setOpen(false)}>MON PROFIL<span className="meta">→</span></Link>
+          <Link href="/moi" onClick={() => setOpen(false)}>REGLAGES<span className="meta">→</span></Link>
+          {user.role === 'admin' && <Link href="/admin" onClick={() => setOpen(false)}>ADMINISTRATION<span className="meta">0x00</span></Link>}
+          <button type="button" onClick={logout}>SE DECONNECTER<span className="meta">×</span></button>
         </div>
       )}
     </div>

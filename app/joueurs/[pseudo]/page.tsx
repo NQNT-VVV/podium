@@ -3,11 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { Avatar } from '@/components/Avatar';
+import { Engraving } from '@/components/Engraving';
 import { MatchList } from '@/components/MatchList';
 import { Sparkline } from '@/components/Sparkline';
 import { TierChip } from '@/components/TierChip';
 import { apiMaybe } from '@/lib/api';
-import { fmtLong } from '@/lib/format';
+import { fmtLongCaps } from '@/lib/format';
+import { fmtInt, hex } from '@/lib/hex';
 import type { PlayerData } from '@/lib/types';
 
 type Props = { params: Promise<{ pseudo: string }> };
@@ -26,67 +28,68 @@ export default async function PlayerPage({ params }: Props) {
   return (
     <main className="shell">
       <header className="profile-head">
+        <Engraving />
         <Avatar emoji={user.avatar} size="lg" />
         <div className="grow">
           <h1>{user.pseudo}</h1>
-          <p className="since">Sur Podium depuis le {fmtLong(user.createdAt)}{user.role === 'admin' ? ' · administrateur' : ''}</p>
-          <div className="row wrap" style={{ gap: 8, marginTop: 10 }}>
-            <span className="pill">Saison {season.label} : <b className="tnum">{season.points} pts</b>{season.pos ? ` · ${season.pos}e` : ''}</span>
-            <span className="pill">{season.wins} victoire{season.wins > 1 ? 's' : ''} / {season.matches} partie{season.matches > 1 ? 's' : ''}</span>
+          <div className="since">
+            <span>FICHE D’IDENTIFICATION · SUJET {user.id.slice(-4).toUpperCase()}{user.role === 'admin' ? ' · ADMINISTRATEUR' : ''}</span>
+            <span>PREMIER CONTACT {fmtLongCaps(user.createdAt)}</span>
+            <span>SAISON {season.label.toUpperCase()} · {fmtInt(season.points)} POINTS{season.pos ? ` · RANG ${hex(season.pos)}` : ''}</span>
+            <span>{season.wins} VICTOIRES / {season.matches} PARTIES</span>
           </div>
         </div>
-        {data.me && <Link className="btn" href="/moi">⚙️ Reglages</Link>}
+        {data.me && <Link className="btn" href="/moi">REGLAGES</Link>}
       </header>
 
       <section className="block">
-        <div className="block-head"><h2 className="section-title">Cotes</h2></div>
+        <div className="block-head"><h2 className="section-title">COTES</h2></div>
         {ratings.length ? (
           <div className="grid-3">
             {ratings.map((r) => (
               <div className="card rating-card" key={r.gameSlug}>
                 <div className="head">
-                  <span style={{ fontSize: 22 }} aria-hidden="true">{r.gameEmoji}</span>
-                  <b><Link href={`/jeux/${r.gameSlug}`}>{r.gameName}</Link></b>
+                  <b><Link href={`/jeux/${r.gameSlug}`}>{r.gameName.toUpperCase()}</Link></b>
                   <span className="grow" />
-                  {r.pos && <span className="pill">{r.pos}e</span>}
+                  {r.pos && <span>RANG {hex(r.pos)}</span>}
                 </div>
                 <div className="big">
-                  <span className="rating">{r.rating}</span>
+                  <span className="rating">{fmtInt(r.rating)}</span>
                   <TierChip tier={r.tier} />
                 </div>
-                <Sparkline points={r.history} id={r.gameSlug} />
+                <Sparkline points={r.history} />
                 <div className="kpis">
-                  <span><b>{r.wins}</b> victoires</span>
-                  <span><b>{r.podiums}</b> podiums</span>
-                  <span><b>{r.matches}</b> parties</span>
-                  <span>record <b>{r.peak}</b></span>
+                  <span>VICTOIRES <b>{r.wins}</b></span>
+                  <span>PODIUMS <b>{r.podiums}</b></span>
+                  <span>PARTIES <b>{r.matches}</b></span>
+                  <span>RECORD <b>{fmtInt(r.peak)}</b></span>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="empty">Aucune partie multijoueur classee pour l’instant.</div>
+          <div className="empty"><span>AUCUNE PARTIE MULTIJOUEUR CLASSEE</span></div>
         )}
       </section>
 
       <div className="two-col">
         <section className="block">
-          <div className="block-head"><h2 className="section-title">Historique</h2></div>
+          <div className="block-head"><h2 className="section-title">HISTORIQUE</h2></div>
           <MatchList matches={matches} mine />
         </section>
         <section className="block">
-          <div className="block-head"><h2 className="section-title">Badges</h2></div>
+          <div className="block-head"><h2 className="section-title">BADGES</h2></div>
           {badges.length ? (
             <div className="badges">
               {badges.map((b) => (
-                <span className="badge" key={b.id} title={fmtLong(b.awardedAt)}>
-                  <span className="e" aria-hidden="true">{b.emoji}</span>
-                  <span>{b.challengeSlug ? <Link href={`/defis/${b.challengeSlug}`}>{b.label}</Link> : b.label}</span>
+                <span className="badge" key={b.id} title={fmtLongCaps(b.awardedAt)}>
+                  <span className={b.kind === 'gold' ? 'e gold' : 'e'}>{b.kind === 'gold' ? '0x01' : b.kind === 'silver' ? '0x02' : '0x03'}</span>
+                  <span>{b.challengeSlug ? <Link href={`/defis/${b.challengeSlug}`}>{b.label.toUpperCase()}</Link> : b.label.toUpperCase()}</span>
                 </span>
               ))}
             </div>
           ) : (
-            <div className="empty">Pas encore de badge. Un top 3 sur un defi en donne un.</div>
+            <div className="empty"><span>PAS ENCORE DE BADGE · UN TOP 3 SUR UN OFFICE EN DONNE UN</span></div>
           )}
         </section>
       </div>
