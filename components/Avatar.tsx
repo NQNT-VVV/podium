@@ -1,8 +1,8 @@
+/** Avatar 48 : carre en dither, le glyphe choisi par le joueur pose sur un aplat de fond, rendu en niveaux d'os. */
 export function Avatar({ emoji, size = 'md', className = '' }: { emoji: string; size?: 'sm' | 'md' | 'lg'; className?: string }) {
-  const style = size === 'sm' ? { width: 28, height: 28, fontSize: 15, borderRadius: 9 } : undefined;
   return (
-    <span className={`avatar ${size === 'lg' ? 'lg' : ''} ${className}`} style={style} aria-hidden="true">
-      {emoji || '🙂'}
+    <span className={`avatar ${size !== 'md' ? size : ''} ${className}`} aria-hidden="true">
+      <span>{emoji || '?'}</span>
     </span>
   );
 }

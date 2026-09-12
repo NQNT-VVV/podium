@@ -16,11 +16,12 @@ export default async function MePage({ searchParams }: Props) {
     <main className="shell">
       <header className="page-head">
         <div>
-          <h1>Reglages</h1>
-          <p>Ton identite dans tous les jeux, et la maniere dont tu te connectes.</p>
+          <div className="kicker"><span>PROCEDURE 0x02</span><span>FICHE DU SUJET</span></div>
+          <h1>REGLAGES</h1>
+          <p>TON IDENTITE DANS TOUS LES JEUX, ET LA MANIERE DONT TU TE CONNECTES.</p>
         </div>
       </header>
-      {sp.discord === 'ok' && <div className="pill ok" style={{ alignSelf: 'flex-start' }}>Discord rattache.</div>}
+      {sp.discord === 'ok' && <div className="pill ok" style={{ alignSelf: 'flex-start' }}>DISCORD RATTACHE</div>}
       <ProfileSettings user={me.user} discord={me.providers.discord} password={me.providers.password} linked={!!me.user.discordName} />
     </main>
   );

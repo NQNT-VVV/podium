@@ -1,41 +1,43 @@
 import Link from 'next/link';
 
 import type { LadderRow } from '@/lib/types';
-import { MEDALS } from '@/lib/format';
+import { fmtInt } from '@/lib/hex';
 import { Avatar } from './Avatar';
+import { Rank } from './Rank';
 import { TierChip } from './TierChip';
 
 export function Ladder({ rows, meId, compact = false }: { rows: LadderRow[]; meId?: string | null; compact?: boolean }) {
-  if (!rows.length) return <div className="empty">Aucune partie classee pour l’instant. Les trois premieres parties servent au placement.</div>;
+  if (!rows.length) {
+    return <div className="empty"><span>AUCUNE PARTIE CLASSEE · LES TROIS PREMIERES SERVENT AU PLACEMENT</span></div>;
+  }
   return (
     <div className="table-wrap">
       <table className="table">
         <thead>
           <tr>
-            <th className="pos">#</th>
-            <th>Joueur</th>
-            <th>Palier</th>
-            <th className="num">Cote</th>
-            {!compact && <th className="num hide-sm">V / P</th>}
-            {!compact && <th className="num hide-sm">Record</th>}
+            <th className="pos">RANG</th>
+            <th>SUJET</th>
+            <th>PALIER</th>
+            <th className="num">COTE</th>
+            {!compact && <th className="num hide-sm">V / PARTIES</th>}
+            {!compact && <th className="num hide-sm">RECORD</th>}
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
             <tr key={r.userId} className={meId === r.userId ? 'me' : ''}>
-              <td className={`pos ${r.pos !== null && r.pos <= 3 ? 'top' : ''}`}>
-                {r.pos === null ? '—' : r.pos <= 3 ? <span className="medal">{MEDALS[r.pos - 1]}</span> : r.pos}
-              </td>
+              <td className={`pos ${r.pos !== null && r.pos <= 3 ? 'top' : ''}`}><Rank pos={r.pos} /></td>
               <td>
                 <span className="player">
                   <Avatar emoji={r.avatar} size="sm" />
-                  <Link href={`/joueurs/${encodeURIComponent(r.pseudo)}`} className="ellipsis">{r.pseudo}</Link>
+                  <Link href={`/joueurs/${encodeURIComponent(r.pseudo)}`}>{r.pseudo}</Link>
+                  {meId === r.userId && <span className="you">VOUS</span>}
                 </span>
               </td>
               <td><TierChip tier={r.tier} /></td>
-              <td className="num rating">{r.rating}</td>
-              {!compact && <td className="num hide-sm muted">{r.wins} / {r.matches}</td>}
-              {!compact && <td className="num hide-sm muted">{r.peak}</td>}
+              <td className="num rating">{fmtInt(r.rating)}</td>
+              {!compact && <td className="num hide-sm meta-cell">{r.wins} / {r.matches}</td>}
+              {!compact && <td className="num hide-sm meta-cell">{fmtInt(r.peak)}</td>}
             </tr>
           ))}
         </tbody>

@@ -6,9 +6,9 @@ import { Brand } from './Brand';
 import { NavUser } from './NavUser';
 
 const LINKS = [
-  { href: '/', label: 'Jeux' },
-  { href: '/classement', label: 'Classement' },
-  { href: '/defis', label: 'Defis' },
+  { href: '/', label: 'JEUX' },
+  { href: '/classement', label: 'CLASSEMENT' },
+  { href: '/defis', label: 'DEFIS' },
 ];
 
 export async function Nav() {
@@ -25,7 +25,8 @@ export async function Nav() {
         {LINKS.map((l) => <Link key={l.href} href={l.href}>{l.label}</Link>)}
       </div>
       <span className="spacer" />
-      {me.user ? <NavUser user={me.user} /> : <Link className="btn sm primary" href="/connexion">Se connecter</Link>}
+      <span className="nav-status"><span className="dot" />SESSION CONSIGNEE</span>
+      {me.user ? <NavUser user={me.user} /> : <Link className="btn sm primary" href="/connexion">SE CONNECTER</Link>}
     </nav>
   );
 }
