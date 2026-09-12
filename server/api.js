@@ -16,6 +16,7 @@ const ingest = require('./ingest');
 const rating = require('./rating');
 const periods = require('./periods');
 const challenges = require('./challenges');
+const community = require('./community');
 const metrics = require('./metrics');
 const { newToken, sha256, normalizePseudo, ApiError, validateAvatar } = require('./util');
 
@@ -315,7 +316,64 @@ function register(app) {
     }
   }));
 
+  /* ---- Salon -------------------------------------------------------- */
+
+  /**
+   * Le fil.
+   *
+   * Lecture ouverte a tous — on doit pouvoir voir de quoi on parle avant de
+   * decider d'entrer. L'ecriture, elle, demande un compte.
+   */
+  app.get('/api/chat', guard((req, res) => {
+    const { messages, cursor } = community.chatSince(req.query.since, req.query.limit);
+    const user = req.user || null;
+    res.json({
+      messages,
+      cursor,
+      me: user ? { id: user.id, role: user.role } : null,
+      limits: { length: config.limits.chatLength, gapMs: config.limits.chatGapMs, keepDays: config.limits.chatKeepDays },
+    });
+  }));
+
+  app.post('/api/chat', guard((req, res) => {
+    const message = community.postChat(auth.requireUser(req), req.body?.body);
+    res.json({ message });
+  }));
+
+  app.delete('/api/chat/:id', guard((req, res) => {
+    res.json({ message: community.removeChat(auth.requireUser(req), req.params.id) });
+  }));
+
+  /* ---- Avis --------------------------------------------------------- */
+
+  app.get('/api/avis', guard((req, res) => {
+    const user = auth.requireUser(req);
+    res.json({ mine: community.myFeedback(user), limits: { length: config.limits.feedbackLength } });
+  }));
+
+  app.post('/api/avis', guard((req, res) => {
+    res.json({ feedback: community.postFeedback(auth.requireUser(req), req.body || {}) });
+  }));
+
   /* ---- Administration --------------------------------------------- */
+
+  /** Relecture des avis : la mesure, sa repartition, et les retours eux-memes. */
+  app.get('/api/admin/reporting', guard((req, res) => {
+    auth.requireAdmin(req);
+    res.json(community.reporting({
+      days: req.query.days,
+      kind: String(req.query.kind || ''),
+      status: String(req.query.status || ''),
+      limit: req.query.limit,
+      offset: req.query.offset,
+    }));
+  }));
+
+  app.patch('/api/admin/reporting/:id', guard((req, res) => {
+    const admin = auth.requireAdmin(req);
+    res.json({ feedback: community.setFeedbackStatus(admin, req.params.id, req.body || {}) });
+  }));
+
 
   app.get('/api/admin/overview', guard((req, res) => {
     auth.requireAdmin(req);

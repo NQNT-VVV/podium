@@ -158,6 +158,47 @@ const MIGRATIONS = [
       CREATE INDEX ingest_log_at_idx ON ingest_log(at);
     `);
   },
+
+  /**
+   * Le salon et les avis.
+   *
+   * Deux usages differents d'une meme idee : laisser les gens parler. Le
+   * salon est ephemere et collectif ; l'avis est adresse a qui tient le site,
+   * et il porte une note pour qu'on puisse en faire une courbe.
+   *
+   * Les messages partent avec le compte : ce sont les mots de quelqu'un, ils
+   * ne lui survivent pas. L'avis, lui, laisse sa note — un chiffre sans
+   * personne derriere — et perd son texte. On garde la mesure, jamais la voix.
+   */
+  function salon(d) {
+    d.exec(`
+      CREATE TABLE chat_message (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id    TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+        body       TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        deleted_at INTEGER,
+        deleted_by TEXT REFERENCES user(id) ON DELETE SET NULL
+      );
+      CREATE INDEX chat_message_at_idx ON chat_message(created_at);
+
+      CREATE TABLE feedback (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id    TEXT REFERENCES user(id) ON DELETE SET NULL,
+        kind       TEXT NOT NULL DEFAULT 'avis',
+        score      INTEGER,
+        body       TEXT NOT NULL DEFAULT '',
+        page       TEXT NOT NULL DEFAULT '',
+        status     TEXT NOT NULL DEFAULT 'nouveau',
+        created_at INTEGER NOT NULL,
+        handled_at INTEGER,
+        handled_by TEXT REFERENCES user(id) ON DELETE SET NULL,
+        note       TEXT NOT NULL DEFAULT ''
+      );
+      CREATE INDEX feedback_at_idx ON feedback(created_at);
+      CREATE INDEX feedback_status_idx ON feedback(status, created_at);
+    `);
+  },
 ];
 
 const applied = db.pragma('user_version', { simple: true });

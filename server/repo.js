@@ -28,6 +28,48 @@ function publicUser(u) {
   return { id: u.id, pseudo: u.pseudo, avatar: u.avatar, role: u.role, createdAt: u.createdAt };
 }
 
+/**
+ * Un message du salon.
+ *
+ * Un message efface garde sa place dans le fil : la page qui suit par curseur
+ * doit apprendre sa disparition, sinon elle afficherait pour toujours celui
+ * qu'elle a deja recu. On ne renvoie que l'absence, jamais le corps.
+ */
+function toChat(row) {
+  if (!row) return null;
+  const gone = !!row.deleted_at;
+  return {
+    id: row.id,
+    userId: gone ? null : row.user_id,
+    pseudo: gone ? null : (row.pseudo || 'Joueur parti'),
+    avatar: gone ? null : (row.avatar || '🙂'),
+    role: gone ? null : row.role,
+    body: gone ? '' : row.body,
+    createdAt: row.created_at,
+    deleted: gone,
+  };
+}
+
+/** Un avis. `withBody` false pour ce qui sort de l'espace d'administration. */
+function toFeedback(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    userId: row.user_id,
+    pseudo: row.user_id ? (row.pseudo || null) : null,
+    avatar: row.user_id ? (row.avatar || '🙂') : null,
+    kind: row.kind,
+    score: row.score,
+    body: row.body,
+    page: row.page,
+    status: row.status,
+    note: row.note || '',
+    createdAt: row.created_at,
+    handledAt: row.handled_at,
+    handledBy: row.handled_by,
+  };
+}
+
 function toGame(row) {
   if (!row) return null;
   return {
@@ -177,6 +219,52 @@ const q = {
   insertLog: db.prepare('INSERT INTO ingest_log (game_slug, external_id, status, detail, at) VALUES (?, ?, ?, ?, ?)'),
   recentLogs: db.prepare('SELECT * FROM ingest_log ORDER BY id DESC LIMIT ?'),
   purgeLogs: db.prepare('DELETE FROM ingest_log WHERE at < ?'),
+
+  // salon
+  insertChat: db.prepare('INSERT INTO chat_message (user_id, body, created_at) VALUES (?, ?, ?)'),
+  chatById: db.prepare(`SELECT c.*, u.pseudo, u.avatar, u.role FROM chat_message c
+    LEFT JOIN user u ON u.id = c.user_id WHERE c.id = ?`),
+  /*
+   * On renvoie aussi les messages effaces, prives de leur corps.
+   *
+   * Sans eux, une page qui suit le fil par curseur ne saurait jamais qu'un
+   * message a disparu : elle garderait indefiniment celui qu'elle a deja.
+   */
+  chatSince: db.prepare(`SELECT c.*, u.pseudo, u.avatar, u.role FROM chat_message c
+    LEFT JOIN user u ON u.id = c.user_id WHERE c.id > ? ORDER BY c.id LIMIT ?`),
+  chatLatest: db.prepare(`SELECT c.*, u.pseudo, u.avatar, u.role FROM chat_message c
+    LEFT JOIN user u ON u.id = c.user_id WHERE c.deleted_at IS NULL ORDER BY c.id DESC LIMIT ?`),
+  chatSoftDelete: db.prepare('UPDATE chat_message SET body = \'\', deleted_at = ?, deleted_by = ? WHERE id = ? AND deleted_at IS NULL'),
+  chatCountSince: db.prepare('SELECT COUNT(*) AS n FROM chat_message WHERE user_id = ? AND created_at > ?'),
+  chatLastAt: db.prepare('SELECT MAX(created_at) AS at FROM chat_message WHERE user_id = ?'),
+  purgeChat: db.prepare('DELETE FROM chat_message WHERE created_at < ?'),
+  chatTotal: db.prepare('SELECT COUNT(*) AS n FROM chat_message WHERE deleted_at IS NULL'),
+
+  // avis
+  insertFeedback: db.prepare(`INSERT INTO feedback (user_id, kind, score, body, page, status, created_at)
+    VALUES (@userId, @kind, @score, @body, @page, 'nouveau', @createdAt)`),
+  feedbackById: db.prepare(`SELECT f.*, u.pseudo, u.avatar FROM feedback f
+    LEFT JOIN user u ON u.id = f.user_id WHERE f.id = ?`),
+  feedbackList: db.prepare(`SELECT f.*, u.pseudo, u.avatar FROM feedback f
+    LEFT JOIN user u ON u.id = f.user_id
+    WHERE (@kind = '' OR f.kind = @kind) AND (@status = '' OR f.status = @status)
+    ORDER BY f.created_at DESC LIMIT @limit OFFSET @offset`),
+  feedbackCount: db.prepare(`SELECT COUNT(*) AS n FROM feedback
+    WHERE (@kind = '' OR kind = @kind) AND (@status = '' OR status = @status)`),
+  feedbackSetStatus: db.prepare('UPDATE feedback SET status = @status, note = @note, handled_at = @at, handled_by = @by WHERE id = @id'),
+  feedbackCountSince: db.prepare('SELECT COUNT(*) AS n FROM feedback WHERE user_id = ? AND created_at > ?'),
+  feedbackMine: db.prepare('SELECT * FROM feedback WHERE user_id = ? ORDER BY created_at DESC LIMIT ?'),
+  // Repartition des notes : la moyenne seule cache toujours quelque chose.
+  feedbackSpread: db.prepare(`SELECT score, COUNT(*) AS n FROM feedback
+    WHERE score IS NOT NULL AND created_at >= ? GROUP BY score ORDER BY score`),
+  feedbackByKind: db.prepare(`SELECT kind, COUNT(*) AS n, AVG(score) AS avg FROM feedback
+    WHERE created_at >= ? GROUP BY kind`),
+  feedbackByStatus: db.prepare('SELECT status, COUNT(*) AS n FROM feedback GROUP BY status'),
+  feedbackDaily: db.prepare(`SELECT created_at / 86400000 AS day, COUNT(*) AS n, AVG(score) AS avg
+    FROM feedback WHERE created_at >= ? GROUP BY day ORDER BY day`),
+  feedbackPages: db.prepare(`SELECT page, COUNT(*) AS n FROM feedback
+    WHERE created_at >= ? AND page != '' GROUP BY page ORDER BY n DESC LIMIT 10`),
+  feedbackAnonymize: db.prepare("UPDATE feedback SET body = '', page = '' WHERE user_id = ?"),
 };
 
 /* ------------------------------------------------------------------ */
@@ -250,6 +338,15 @@ module.exports = {
    */
   deleteUser: (id) => db.transaction(() => {
     q.anonymizeMatchPlayers.run({ userId: id, nickname: 'Joueur parti' });
+    /*
+     * L'avis perd son texte et sa page, il garde sa note.
+     *
+     * Un chiffre detache de tout ne designe plus personne, et c'est lui qui
+     * fait la courbe : l'effacer reecrirait l'historique de la mesure. Les
+     * mots, eux, appartiennent a qui les a ecrits et partent avec lui — la
+     * cle etrangere passera `user_id` a NULL juste apres.
+     */
+    q.feedbackAnonymize.run(id);
     return q.deleteUser.run(id).changes;
   })(),
   userMatchesAll: (userId) => q.userMatchesAll.all(userId).map((r) => ({
@@ -325,4 +422,33 @@ module.exports = {
   log: (gameSlug, externalId, status, detail = null) => q.insertLog.run(gameSlug, externalId, status, detail, Date.now()),
   recentLogs: (limit = 50) => q.recentLogs.all(limit),
   purgeLogs: (before) => q.purgeLogs.run(before),
+
+  // salon
+  insertChat: (userId, body, at = Date.now()) => toChat(q.chatById.get(q.insertChat.run(userId, body, at).lastInsertRowid)),
+  chatById: (id) => toChat(q.chatById.get(id)),
+  /** Le fil depuis un curseur. `since` a 0 rend la derniere page, dans l'ordre. */
+  chatSince: (since, limit = 200) => (since > 0
+    ? q.chatSince.all(since, limit).map(toChat)
+    : q.chatLatest.all(limit).map(toChat).reverse()),
+  chatSoftDelete: (id, by, at = Date.now()) => q.chatSoftDelete.run(at, by, id).changes,
+  chatCountSince: (userId, since) => q.chatCountSince.get(userId, since).n,
+  chatLastAt: (userId) => q.chatLastAt.get(userId).at || 0,
+  purgeChat: (before) => q.purgeChat.run(before).changes,
+  chatTotal: () => q.chatTotal.get().n,
+
+  // avis
+  insertFeedback: (f) => toFeedback(q.feedbackById.get(q.insertFeedback.run(f).lastInsertRowid)),
+  feedbackById: (id) => toFeedback(q.feedbackById.get(id)),
+  feedbackList: ({ kind = '', status = '', limit = 30, offset = 0 } = {}) =>
+    q.feedbackList.all({ kind, status, limit, offset }).map(toFeedback),
+  feedbackCount: ({ kind = '', status = '' } = {}) => q.feedbackCount.get({ kind, status }).n,
+  feedbackSetStatus: (id, status, note, by, at = Date.now()) =>
+    q.feedbackSetStatus.run({ id, status, note, by, at }).changes,
+  feedbackCountSince: (userId, since) => q.feedbackCountSince.get(userId, since).n,
+  feedbackMine: (userId, limit = 5) => q.feedbackMine.all(userId, limit).map(toFeedback),
+  feedbackSpread: (since = 0) => q.feedbackSpread.all(since),
+  feedbackByKind: (since = 0) => q.feedbackByKind.all(since),
+  feedbackByStatus: () => q.feedbackByStatus.all(),
+  feedbackDaily: (since = 0) => q.feedbackDaily.all(since),
+  feedbackPages: (since = 0) => q.feedbackPages.all(since),
 };

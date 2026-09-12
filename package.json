@@ -21,6 +21,7 @@
     "test:periods": "node test/periods.mjs",
     "test:auth": "node test/auth-modes.mjs",
     "test:offboarding": "node test/offboarding.mjs",
+    "test:community": "node test/community.mjs",
     "pretest": "node scripts/check-node.js",
     "test": "node test/e2e.mjs"
   },

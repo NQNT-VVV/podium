@@ -314,3 +314,129 @@
   .match { grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
   .match .when { text-align: left; justify-items: start; }
 }
+
+/* --------------------------------------------------------------------------
+   Salon
+   Un fil qu'on lit de haut en bas, un champ en bas. Le fil defile seul : la
+   page ne bouge pas quand la conversation avance, sinon lire le reste
+   deviendrait impossible des que quelqu'un parle.
+   -------------------------------------------------------------------------- */
+.salon { display: grid; gap: var(--sp-4); }
+.salon-fil {
+  display: grid; align-content: start; gap: var(--sp-3);
+  height: min(60vh, 560px); overflow-y: auto; overscroll-behavior: contain;
+  border: var(--border); padding: var(--sp-4);
+}
+.salon-fil .empty { height: 100%; align-content: center; }
+.salon-msg { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: var(--sp-3); align-items: start; }
+.salon-msg.suite { margin-top: calc(var(--sp-3) * -1 + 2px); }
+.salon-gouttiere { display: block; width: 32px; }
+.salon-corps { display: grid; gap: var(--sp-1); min-width: 0; }
+.salon-qui { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.salon-qui b { font: var(--t-ui); letter-spacing: var(--ls-mono); font-weight: 400; color: var(--ink); }
+.salon-qui time { font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--ink-55); }
+/* Un message est une chaine lue pour elle-meme : jamais en --t-meta, jamais en
+   capitales. Les retours a la ligne de l'auteur sont gardes, les mots trop
+   longs cassent plutot que de pousser le fil hors de l'ecran. */
+.salon-corps p {
+  margin: 0; font: var(--t-prose); letter-spacing: var(--ls-prose); color: var(--ink-90);
+  white-space: pre-wrap; overflow-wrap: anywhere; text-transform: none;
+}
+.salon-retirer { opacity: 0; }
+.salon-msg:hover .salon-retirer, .salon-retirer:focus-visible { opacity: 1; }
+/* Sans survol, il n'y a rien a reveler : le bouton reste la. */
+@media (pointer: coarse) { .salon-retirer { opacity: 1; } }
+.salon-retard { display: flex; align-items: center; gap: var(--sp-2); font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--ink); border: var(--border-live); padding: var(--sp-2) var(--sp-3); }
+.salon-champ { display: grid; gap: var(--sp-2); }
+.salon-champ textarea { resize: vertical; min-height: 64px; }
+.salon-envoi { display: flex; align-items: center; gap: var(--sp-3); }
+.salon-ferme { display: grid; gap: var(--sp-2); justify-items: start; border: var(--border); padding: var(--sp-4); }
+.salon-ferme p { margin: 0; }
+
+/* --------------------------------------------------------------------------
+   Avis
+   -------------------------------------------------------------------------- */
+.avis { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--sp-4); align-items: start; }
+.avis-form { display: grid; gap: var(--sp-4); }
+.tabs.tabs-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.note { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+/* 44 px des le depart : la note se donne au doigt, sur un telephone, et une
+   cible de 28 px se rate une fois sur trois. */
+.note-cran {
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border: var(--border-ui); background: transparent; color: var(--ink-55);
+  cursor: pointer; transition: none;
+}
+.note-cran:hover { border-color: var(--ink); color: var(--ink); }
+.note-cran.pleine { color: var(--gold); border-color: var(--gold); }
+.note-dit { font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--ink-55); margin-left: var(--sp-2); }
+.avis-miens { display: grid; gap: var(--sp-3); align-content: start; }
+.avis-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.avis-liste li { display: grid; gap: var(--sp-2); border: var(--border); padding: var(--sp-3); }
+.avis-liste p { margin: 0; font: var(--t-prose); letter-spacing: var(--ls-prose); color: var(--ink-90); white-space: pre-wrap; overflow-wrap: anywhere; }
+.avis-tete { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.avis-note-dit { display: inline-flex; align-items: center; gap: var(--sp-1); font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--gold); }
+/* L'etat se lit au mot, pas a la couleur : un aplat pour ce qui est clos, un
+   trait pour ce qui attend. Rien ne repose sur la seule teinte. */
+.avis-etat.nouveau { border-color: var(--ink); color: var(--ink); }
+.avis-etat.lu { border-color: var(--ink-45); color: var(--ink-60); }
+.avis-etat.traite { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.avis-reponse {
+  border-left: var(--border-strong); padding-left: var(--sp-3);
+  font: var(--t-prose); letter-spacing: var(--ls-prose); color: var(--ink-90);
+}
+.avis-reponse b { font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--ink-55); display: block; }
+
+/* --------------------------------------------------------------------------
+   Reporting
+   -------------------------------------------------------------------------- */
+.rep { display: grid; gap: var(--sp-4); }
+.rep[aria-busy="true"] { opacity: .6; }
+.rep-fenetre { justify-self: start; }
+.rep-tetes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: var(--sp-4); }
+.rep-chiffre { display: grid; gap: var(--sp-1); align-content: start; }
+.rep-chiffre b { font: var(--t-display); letter-spacing: var(--ls-display); font-size: clamp(32px, 6vw, 48px); line-height: 1; color: var(--ink); }
+.rep-reserve { display: flex; gap: var(--sp-2); align-items: flex-start; margin: var(--sp-2) 0 0; font: var(--t-prose); letter-spacing: var(--ls-prose); color: var(--ink-90); border-top: var(--border); padding-top: var(--sp-2); }
+.rep-deux { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--sp-4); align-items: start; }
+.rep-spread { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.rep-spread li { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: var(--sp-3); align-items: center; }
+.rep-spread-note { display: inline-flex; align-items: center; gap: var(--sp-1); font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--gold); }
+.rep-spread-piste { height: 12px; border: var(--border); overflow: hidden; }
+.rep-spread-piste i { display: block; height: 100%; background: var(--ink); transform-origin: left; }
+.rep-spread-n { font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--ink); }
+.rep-volume { display: flex; align-items: flex-end; gap: 1px; height: 72px; border-bottom: var(--border); padding-bottom: 1px; }
+.rep-barre { flex: 1; min-width: 2px; background: var(--ink); min-height: 1px; }
+/* Un jour sans retour reste visible : un trait bas plutot qu'un vide, sinon
+   la serie se lirait comme si ces jours n'existaient pas. */
+.rep-barre.vide { background: var(--ink-25); height: 1px !important; }
+.rep-legende { display: flex; margin-top: var(--sp-2); }
+.rep-natures { list-style: none; margin: var(--sp-4) 0 0; padding: var(--sp-3) 0 0; border-top: var(--border); display: flex; gap: var(--sp-6); flex-wrap: wrap; }
+.rep-natures li { display: grid; gap: 2px; }
+.rep-natures b { font: var(--t-h2); letter-spacing: var(--ls-display); color: var(--ink); }
+.rep-pages { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); }
+.rep-pages li { display: flex; align-items: center; gap: var(--sp-3); font: var(--t-meta); letter-spacing: var(--ls-mono); border-bottom: var(--border); padding-bottom: var(--sp-2); }
+.rep-pages code { color: var(--ink); overflow-wrap: anywhere; }
+.rep-filtres { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-4); }
+.rep-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+.rep-item { display: grid; gap: var(--sp-2); border: var(--border); padding: var(--sp-3); }
+/* Ce qui n'a pas encore ete lu porte une bande : on doit le voir sans lire. */
+.rep-item.nouveau { border-color: var(--ink); background-image: var(--hatch); background-repeat: repeat-y; background-size: 8px 8px; background-position: left; padding-left: var(--sp-4); }
+.rep-item-tete { display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+.rep-item-tete .grow { display: grid; gap: 2px; }
+.rep-item-tete b { font: var(--t-ui); letter-spacing: var(--ls-mono); font-weight: 400; color: var(--ink); }
+.rep-parti { width: 32px; height: 32px; border: var(--border); background-image: var(--dither-25); background-size: var(--dither-size); }
+.rep-item-note { display: inline-flex; align-items: center; gap: var(--sp-1); font: var(--t-meta); letter-spacing: var(--ls-mono); color: var(--gold); }
+.rep-item-corps { margin: 0; font: var(--t-prose); letter-spacing: var(--ls-prose); color: var(--ink-90); white-space: pre-wrap; overflow-wrap: anywhere; }
+.rep-item-actions { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.rep-item-reponse { display: grid; gap: var(--sp-2); border-top: var(--border); padding-top: var(--sp-3); }
+
+@media (max-width: 860px) {
+  .avis { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .salon-fil { height: min(56vh, 420px); padding: var(--sp-3); }
+  .salon-msg { grid-template-columns: 28px minmax(0, 1fr) auto; gap: var(--sp-2); }
+  .salon-gouttiere { width: 28px; }
+  .rep-spread li { grid-template-columns: 48px minmax(0, 1fr) auto; gap: var(--sp-2); }
+  .rep-natures { gap: var(--sp-4); }
+}

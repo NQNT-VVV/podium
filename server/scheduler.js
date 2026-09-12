@@ -2,13 +2,15 @@
 
 /**
  * Taches de fond : defis a creer pour la periode courante et la suivante,
- * defis termines a clore (badges), sessions et journaux perimes a purger.
+ * defis termines a clore (badges), sessions, journaux et messages du salon
+ * perimes a purger.
  * Idempotent : peut tourner autant de fois qu'on veut.
  */
 
 const config = require('./config');
 const repo = require('./repo');
 const challenges = require('./challenges');
+const community = require('./community');
 
 function tick() {
   try {
@@ -18,6 +20,9 @@ function tick() {
     if (closed.length) console.log(`[podium] ${closed.length} defi(s) clos : ${closed.map((c) => c.slug).join(', ')}`);
     repo.purgeSessions();
     repo.purgeLogs(Date.now() - 30 * 86400000);
+    // Le salon oublie de lui-meme : ce qui s'y dit n'a pas vocation a rester.
+    const oublies = community.purgeChat();
+    if (oublies) console.log(`[podium] salon : ${oublies} message(s) perime(s) efface(s)`);
     const gone = purgeInactive();
     if (gone) console.log(`[podium] ${gone} compte(s) inactif(s) supprime(s)`);
   } catch (err) {

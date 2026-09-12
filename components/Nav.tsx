@@ -9,6 +9,7 @@ const LINKS = [
   { href: '/', label: 'JEUX' },
   { href: '/classement', label: 'CLASSEMENT' },
   { href: '/defis', label: 'DEFIS' },
+  { href: '/salon', label: 'SALON' },
 ];
 
 export async function Nav() {
