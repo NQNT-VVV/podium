@@ -440,3 +440,10 @@
   .rep-spread li { grid-template-columns: 48px minmax(0, 1fr) auto; gap: var(--sp-2); }
   .rep-natures { gap: var(--sp-4); }
 }
+
+/* La barre de navigation et le menu du compte se touchent : 28 px de haut se
+   ratent une fois sur trois. Ces classes appartiennent a Podium, pas au socle
+   partage, et c'est donc ici qu'on les met a la taille du doigt. */
+@media (pointer: coarse) {
+  .nav-links a, .nav-user > button { min-height: 44px; display: inline-flex; align-items: center; }
+}

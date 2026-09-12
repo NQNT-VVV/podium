@@ -87,7 +87,10 @@ function actualScore(rank, players) {
  */
 function seasonPoints(rank, n) {
   if (n < 2) return 0;
-  return Math.round((100 * (n - rank)) / (n - 1)) + 10;
+  // Dernier au mieux : un rang plus grand que le plateau rendrait un negatif,
+  // et un classement de saison ne descend pas sous zero.
+  const place = Math.min(Math.max(1, rank), n);
+  return Math.round((100 * (n - place)) / (n - 1)) + 10;
 }
 
 module.exports = { TIERS, tierOf, kFor, rateMatch, actualScore, seasonPoints };

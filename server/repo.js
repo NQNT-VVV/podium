@@ -6,6 +6,9 @@
  */
 
 const db = require('./db');
+
+/** Doit rester egal a `GRACE_MS` de l'ingestion : les deux bornent la meme fenetre. */
+const INGEST_GRACE_MS = 3600000;
 const { json } = require('./util');
 
 /* ------------------------------------------------------------------ */
@@ -184,12 +187,12 @@ const q = {
       COUNT(DISTINCT m.game_slug) AS games
     FROM match_player mp JOIN match m ON m.id = mp.match_id JOIN user u ON u.id = mp.user_id
     WHERE m.played_at BETWEEN @start AND @end
-    GROUP BY u.id HAVING points > 0 ORDER BY points DESC, wins DESC, matches ASC LIMIT @limit`),
+    GROUP BY u.id HAVING SUM(mp.points) > 0 ORDER BY points DESC, wins DESC, matches ASC LIMIT @limit`),
   seasonGameLadder: db.prepare(`SELECT u.id, u.pseudo, u.avatar, SUM(mp.points) AS points, COUNT(*) AS matches,
       SUM(CASE WHEN mp.rank = 1 AND m.players_count >= 2 THEN 1 ELSE 0 END) AS wins, 1 AS games
     FROM match_player mp JOIN match m ON m.id = mp.match_id JOIN user u ON u.id = mp.user_id
     WHERE m.played_at BETWEEN @start AND @end AND m.game_slug = @gameSlug
-    GROUP BY u.id HAVING points > 0 ORDER BY points DESC, wins DESC, matches ASC LIMIT @limit`),
+    GROUP BY u.id HAVING SUM(mp.points) > 0 ORDER BY points DESC, wins DESC, matches ASC LIMIT @limit`),
   userSeason: db.prepare(`SELECT SUM(mp.points) AS points, COUNT(*) AS matches,
       SUM(CASE WHEN mp.rank = 1 AND m.players_count >= 2 THEN 1 ELSE 0 END) AS wins
     FROM match_player mp JOIN match m ON m.id = mp.match_id WHERE mp.user_id = @userId AND m.played_at BETWEEN @start AND @end`),
@@ -290,8 +293,16 @@ const boardCache = new Map();
 function challengeBoard(ch, limit = 50) {
   const metric = METRIC_SQL[ch.metric];
   if (!metric) return [];
+  /*
+   * La fenetre du classement epouse celle de l'ingestion.
+   *
+   * L'ingestion accepte une heure de retard apres la cloture ; ce filtre
+   * s'arretait a la cloture. Une partie deposee dans cet intervalle recevait
+   * un « ok », se voyait rattachee au defi, et n'apparaissait dans aucun
+   * classement — la personne etait assuree que son score comptait.
+   */
   const where = ['m.played_at BETWEEN @start AND @end', 'mp.user_id IS NOT NULL'];
-  const args = { start: ch.startsAt, end: ch.endsAt, limit };
+  const args = { start: ch.startsAt, end: ch.endsAt + INGEST_GRACE_MS, limit };
   if (ch.gameSlug) { where.push('m.game_slug = @game'); args.game = ch.gameSlug; }
   const mode = ch.kind === 'mode' ? ch.mode : ch.params?.mode;
   if (ch.kind === 'mode') {

@@ -13,6 +13,16 @@ const repo = require('./repo');
 const rating = require('./rating');
 const { sha256, safeEqual, ApiError, validateAvatar } = require('./util');
 
+/**
+ * Tolerance apres la fin d'un defi.
+ *
+ * Une partie lancee avant la cloture se termine parfois apres, et un jeu qui
+ * n'a pas pu joindre le hub rattrape son envoi plus tard. On accepte donc une
+ * heure de retard — mais le classement du defi doit s'ouvrir d'autant, sinon
+ * on repond « recu » a une partie qui n'apparaitra jamais nulle part.
+ */
+const GRACE_MS = 3600000;
+
 function authenticate(game, header) {
   const m = /^Bearer\s+(.+)$/i.exec(String(header || ''));
   if (!m || !game.ingestKeyHash) throw new ApiError('Cle d’ingestion invalide.', 401);
@@ -37,6 +47,10 @@ function validate(body) {
     if (!Number.isFinite(score)) throw new ApiError(`players[${i}] : score numerique attendu.`, 422);
     const rank = Math.trunc(Number(p.rank));
     if (!Number.isFinite(rank) || rank < 1) throw new ApiError(`players[${i}] : rank entier >= 1 attendu.`, 422);
+    // Un rang au-dela du nombre de joueurs n'existe pas, et la formule des
+    // points de saison, elle, ne s'en apercoit pas : elle rend un nombre
+    // negatif qui entraine tout un classement avec lui.
+    if (rank > body.players.length) throw new ApiError(`players[${i}] : rank ${rank} au-dela des ${body.players.length} joueurs.`, 422);
     const pid = p.pid === null || p.pid === undefined || p.pid === '' ? null : String(p.pid).slice(0, 64);
     return { pid, nickname, avatar: validateAvatar(p.avatar, '') ?? '', score, rank };
   });
@@ -65,7 +79,7 @@ function ingest(game, body) {
   let challengeId = null;
   if (input.challengeId) {
     const ch = repo.challengeById(input.challengeId);
-    if (ch && ch.gameSlug === game.slug && ch.kind === 'mode' && input.playedAt >= ch.startsAt && input.playedAt <= ch.endsAt + 3600000) {
+    if (ch && ch.gameSlug === game.slug && ch.kind === 'mode' && input.playedAt >= ch.startsAt && input.playedAt <= ch.endsAt + GRACE_MS) {
       challengeId = ch.id;
     }
   }
@@ -101,7 +115,16 @@ function ingest(game, body) {
     const ratings = [];
     for (const p of players) {
       const d = byPos.get(p.position) || null;
-      const points = p.user ? rating.seasonPoints(p.rank, n) : 0;
+      /*
+       * Les points de saison suivent la meme regle que l'Elo : une fois par
+       * compte.
+       *
+       * Ils se calculaient sur `p.user`, l'Elo sur `p.rated`. Un meme compte
+       * inscrit deux fois dans la partie — deux telephones, deux onglets —
+       * encaissait donc ses points deux fois et comptait deux parties, alors
+       * que sa cote, elle, ne bougeait qu'une fois.
+       */
+      const points = p.rated ? rating.seasonPoints(p.rank, n) : 0;
       repo.insertMatchPlayer({
         matchId: id, position: p.position, userId: p.user ? p.user.id : null, nickname: p.nickname, avatar: p.avatar || (p.user ? p.user.avatar : ''),
         score: p.score, rank: p.rank, ratingBefore: d ? d.before : null, ratingAfter: d ? d.after : null, points,

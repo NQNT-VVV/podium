@@ -10,7 +10,14 @@ function Name({ p }: { p: Match['players'][number] }) {
   return <span className="faint" title="SANS COMPTE PODIUM">{p.nickname}</span>;
 }
 
-export function MatchList({ matches, withGame = true, mine = false }: { matches: Match[]; withGame?: boolean; mine?: boolean }) {
+/**
+ * `meId` designe la personne dont on regarde le profil.
+ *
+ * L'ecart de cote se posait sur qui partageait son rang : a egalite, il
+ * s'affichait a cote de quelqu'un d'autre. On compare des identites, pas des
+ * positions.
+ */
+export function MatchList({ matches, withGame = true, mine = false, meId = null }: { matches: Match[]; withGame?: boolean; mine?: boolean; meId?: string | null }) {
   if (!matches.length) return <div className="empty"><span>Aucune partie remontee pour l’instant.</span></div>;
   return (
     <div className="matches">
@@ -32,7 +39,7 @@ export function MatchList({ matches, withGame = true, mine = false }: { matches:
                 ) : top.map((p) => (
                   <span key={p.position}>
                     <span className={p.rank === 1 ? 'rk gold' : 'rk'}>{hex(p.rank)}</span> <Name p={p} />
-                    {mine && m.mine && p.rank === m.mine.rank && <Delta before={m.mine.ratingBefore} after={m.mine.ratingAfter} />}
+                    {mine && m.mine && meId !== null && p.userId === meId && <Delta before={m.mine.ratingBefore} after={m.mine.ratingAfter} />}
                   </span>
                 ))}
                 {m.playersCount > 3 && <span className="faint">+{m.playersCount - 3}</span>}

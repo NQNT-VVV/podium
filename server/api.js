@@ -62,11 +62,25 @@ function matchView(m) {
   };
 }
 
+/**
+ * Le classement d'un jeu.
+ *
+ * A cote egale, meme rang — et le suivant saute d'autant. C'est ce que
+ * `gameRankOf` calcule pour la page d'un joueur : numeroter ici a la suite
+ * faisait dire deux choses differentes au classement et au profil pour la
+ * meme personne.
+ */
 function ladderView(slug, limit = 100) {
+  let places = 0;
   let pos = 0;
+  let precedente = null;
   return repo.gameLadder(slug, limit, config.rating.placementMatches).map((r) => {
     const placed = r.matches >= config.rating.placementMatches;
-    if (placed) pos += 1;
+    if (placed) {
+      places += 1;
+      if (precedente === null || r.rating !== precedente) pos = places;
+      precedente = r.rating;
+    }
     return {
       pos: placed ? pos : null, userId: r.user_id, pseudo: r.pseudo, avatar: r.avatar,
       rating: Math.round(r.rating), matches: r.matches, wins: r.wins, podiums: r.podiums, peak: Math.round(r.peak),
@@ -286,16 +300,38 @@ function register(app) {
 
   /* ---- API jeux (v1) ---------------------------------------------- */
 
+  /**
+   * Les defis en cours, graine comprise — donc reserve au jeu lui-meme.
+   *
+   * La graine determine le morceau du jour : la page publique la retient
+   * deliberement tant que le defi court. Servie ici sans authentification,
+   * elle permettait a n'importe qui de calculer la reponse a l'avance par une
+   * seule requete, et rendait cette retenue decorative.
+   *
+   * Sans cle, on repond quand meme : le jeu qui n'en a pas encore recu une
+   * garde de quoi afficher les defis, il n'a simplement pas la graine.
+   */
   app.get('/api/v1/games/:slug/challenges/active', guard((req, res) => {
     const game = repo.gameBySlug(req.params.slug);
     if (!game) throw new ApiError('Jeu inconnu.', 404);
     const now = Date.now();
-    res.set('Cache-Control', 'public, max-age=60');
+
+    let withSeed = false;
+    try {
+      ingest.authenticate(game, req.headers.authorization);
+      withSeed = true;
+    } catch {
+      // Cle absente ou fausse : on sert la vue publique, sans graine.
+    }
+
+    // Une reponse qui depend de la cle presentee ne se met pas dans un cache
+    // partage : elle y servirait la graine a qui n'en a pas.
+    res.set('Cache-Control', withSeed ? 'private, no-store' : 'public, max-age=60');
     res.json({
       now,
       challenges: repo.activeGameChallenges(game.slug, now)
         .filter((c) => c.gameSlug === game.slug)
-        .map((c) => challenges.view(c, { withSeed: true, now })),
+        .map((c) => challenges.view(c, { withSeed, now })),
     });
   }));
 

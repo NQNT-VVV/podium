@@ -142,8 +142,22 @@ function createCustom(input, userId) {
   const gameSlug = input.gameSlug ? String(input.gameSlug) : null;
   if (gameSlug && !repo.gameBySlug(gameSlug)) throw Object.assign(new Error('Jeu inconnu.'), { status: 404, expected: true });
   if (kind === 'mode' && !gameSlug) throw Object.assign(new Error('Un defi « mode » est lie a un jeu.'), { status: 400, expected: true });
-  const startsAt = Number(input.startsAt) || now;
-  const endsAt = Number(input.endsAt) || startsAt + 7 * 86400000;
+  /*
+   * Les bornes se lisent dans le fuseau du hub.
+   *
+   * Le panneau envoie ce qui a ete tape — « 2026-09-12T14:00 » — et affiche le
+   * fuseau du serveur a cote du champ. Un nombre reste accepte, pour les
+   * appelants qui calculent eux-memes leur instant.
+   */
+  const borne = (raw) => {
+    if (raw === null || raw === undefined || raw === '') return null;
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    const n = Number(raw);
+    if (Number.isFinite(n) && String(raw).trim() !== '' && !/[-T:]/.test(String(raw))) return n;
+    return periods.parseLocal(raw, config.timeZone);
+  };
+  const startsAt = borne(input.startsAt) ?? now;
+  const endsAt = borne(input.endsAt) ?? startsAt + 7 * 86400000;
   if (endsAt <= startsAt) throw Object.assign(new Error('La fin precede le debut.'), { status: 400, expected: true });
   const base = title.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
   let slug = `${gameSlug || 'global'}-${base}`;

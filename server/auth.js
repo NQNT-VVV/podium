@@ -113,7 +113,16 @@ function verifySso(raw) {
   if (!safeEqual(raw.slice(dot + 1), expected)) return null;
   try {
     const p = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
-    if (p.v !== 1 || typeof p.pid !== 'string' || p.exp * 1000 < Date.now()) return null;
+    /*
+     * L'echeance doit exister avant d'etre comparee.
+     *
+     * Sans le controle de type, un jeton sans `exp` donnait `NaN < Date.now()`,
+     * c'est-a-dire faux, et passait pour valide — indefiniment. La signature
+     * etant faite d'un secret partage avec les jeux, chacun d'eux pouvait
+     * ainsi se forger une identite de hub qui n'expire jamais.
+     */
+    if (p.v !== 1 || typeof p.pid !== 'string' || typeof p.exp !== 'number' || !Number.isFinite(p.exp)) return null;
+    if (p.exp * 1000 < Date.now()) return null;
     return p;
   } catch {
     return null;

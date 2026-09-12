@@ -47,6 +47,33 @@ function localMidnight(y, m, d, tz) {
   return guess;
 }
 
+/**
+ * Instant UTC d'une heure murale dans un fuseau.
+ *
+ * Meme double passe que `localMidnight`, pour la meme raison : le decalage se
+ * lit a un instant, et l'instant depend du decalage. Sert a comprendre une
+ * date saisie a la main — « le 12 a 14 h » veut dire 14 h la-bas, pas 14 h
+ * dans le navigateur de qui l'a tapee.
+ */
+function localInstant(y, m, d, h = 0, mi = 0, tz = 'UTC') {
+  const naive = Date.UTC(y, m - 1, d, h, mi);
+  let guess = naive - offsetMin(naive, tz) * 60000;
+  guess = naive - offsetMin(guess, tz) * 60000;
+  return guess;
+}
+
+/**
+ * Lit une saisie « AAAA-MM-JJTHH:MM » dans le fuseau donne.
+ *
+ * Rend null si la chaine n'a pas cette forme : l'appelant decide alors quoi
+ * faire, plutot que de recevoir une date silencieusement fausse.
+ */
+function parseLocal(raw, tz) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?/.exec(String(raw || '').trim());
+  if (!m) return null;
+  return localInstant(Number(m[1]), Number(m[2]), Number(m[3]), Number(m[4] || 0), Number(m[5] || 0), tz);
+}
+
 const pad = (n) => String(n).padStart(2, '0');
 
 function dayOf(ms, tz) {
@@ -96,4 +123,4 @@ function periodOf(kind, ms, tz) {
   throw new Error(`periode inconnue : ${kind}`);
 }
 
-module.exports = { parts, offsetMin, localMidnight, dayOf, weekOf, monthOf, monthFromKey, periodOf, MONTHS };
+module.exports = { parts, offsetMin, localMidnight, dayOf, weekOf, monthOf, monthFromKey, periodOf, MONTHS, localInstant, parseLocal };
