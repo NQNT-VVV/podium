@@ -85,8 +85,9 @@ export default async function PrivacyPage() {
           <li>
             <b><code>nqnt_id</code></b> — votre identite signee (identifiant, pseudo, avatar), posee sur le domaine
             <code>.danwalex.com</code> pour que les jeux vous reconnaissent sans nouvelle connexion. 30 jours,
-            renouvele tant que vous etes actif. Les jeux ne peuvent que le lire ; ils ne peuvent ni le forger ni le
-            modifier.
+            renouvele tant que vous etes actif. Il est signe avec un secret partage avec les jeux : personne
+            d’exterieur ne peut le fabriquer, mais les jeux relies au hub le peuvent — ils sont tenus par la meme
+            personne que Podium, et ce sont eux que le cookie sert a prevenir.
           </li>
           <li><b><code>podium_oauth</code></b> — dix minutes, le temps de la connexion Discord, pour la securiser.</li>
         </ul>
@@ -103,18 +104,28 @@ export default async function PrivacyPage() {
       <section className="legal-section">
         <h2>CONSERVATION ET DEPART</h2>
         <ul>
-          <li><b>Compte</b> : tant qu’il est utilise. Sans aucune connexion pendant <b>24 mois</b>, il est supprime automatiquement.</li>
-          <li><b>Sessions</b> : 30 jours, puis purgees.</li>
+          <li>
+            <b>Compte</b> : tant qu’il est utilise. Sans aucune connexion pendant <b>24 mois</b>, il est supprime
+            automatiquement. Les comptes d’administration sont epargnes par cette purge : un hub sans administrateur
+            ne se repare plus.
+          </li>
+          <li><b>Sessions</b> : 30 jours, puis purgees. Chacune retient le navigateur declare, pour que vous puissiez reconnaitre un appareil.</li>
           <li>
             <b>Parties</b> : conservees, car elles appartiennent aussi aux autres joueurs. A la suppression d’un compte,
             sa ligne y devient « Joueur parti », sans identifiant.
+          </li>
+          <li><b>Messages du salon</b> : 90 jours, puis effaces. Ils partent aussi avec le compte, entierement : ce sont vos mots.</li>
+          <li>
+            <b>Avis et signalements</b> : le texte que vous ecrivez part avec votre compte. La note chiffree reste,
+            detachee de vous et de toute page — c’est elle qui fait la moyenne, et l’effacer reecrirait une mesure
+            qui ne designe plus personne.
           </li>
           <li><b>Journal des resultats</b> : 30 jours.</li>
         </ul>
         <p>
           <b>Partir se fait seul, immediatement</b> : dans vos reglages, « Supprimer mon compte » efface le compte, les
-          sessions, les cotes et les badges, et anonymise vos lignes dans les parties. Aucune demande a formuler, aucun
-          delai.
+          sessions, les cotes, les badges et vos messages du salon, anonymise vos lignes dans les parties et retire le
+          texte de vos avis. Aucune demande a formuler, aucun delai.
         </p>
       </section>
 

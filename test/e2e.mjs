@@ -161,11 +161,17 @@ try {
   r = await call('nobody', 'GET', '/api/leaderboard?season=2020-01');
   assert.equal(r.json.rows.length, 0);
 
-  // Defis actifs pour le jeu, avec graine.
-  r = await call('nobody', 'GET', '/api/v1/games/refrain/challenges/active');
+  // Defis actifs pour le jeu, avec graine — la cle du jeu l'ouvre.
+  r = await call('game', 'GET', '/api/v1/games/refrain/challenges/active', undefined, auth);
   const daily = r.json.challenges.find((c) => c.kind === 'mode' && c.mode === 'daily');
   assert.ok(daily && daily.seed && daily.seed.length === 32, 'defi du jour avec graine');
   assert.ok(r.json.challenges.every((c) => c.kind !== 'mode' || c.seed));
+
+  // Sans la cle, les memes defis, mais pas la graine : elle designe le morceau
+  // du jour, et une seule requete publique donnait la reponse a l'avance.
+  r = await call('nobody', 'GET', '/api/v1/games/refrain/challenges/active');
+  assert.ok(r.json.challenges.length >= 1, 'les defis restent lisibles sans cle');
+  assert.ok(r.json.challenges.every((c) => !c.seed), 'aucune graine sans la cle');
   const weekly = r.json.challenges.find((c) => c.kind === 'auto');
   assert.ok(weekly, 'un defi hebdo auto existe');
 
@@ -226,7 +232,10 @@ try {
   });
   assert.equal(r.status, 201, r.text);
   r = await call('nobody', 'GET', '/api/v1/games/puzzle/challenges/active');
-  assert.ok(r.json.challenges.some((c) => c.mode === 'weekly-grid' && c.seed));
+  // Le defi du mode est cree dans la foulee du jeu. Sa graine, elle, n'est pas
+  // la : ce jeu n'a pas encore de cle, et sans cle on n'ouvre pas la graine.
+  assert.ok(r.json.challenges.some((c) => c.mode === 'weekly-grid'), 'le defi du mode existe');
+  assert.ok(r.json.challenges.every((c) => !c.seed), 'pas de graine sans cle');
   r = await call('alice', 'GET', '/api/admin/overview');
   assert.equal(r.json.games.length, 3);
   assert.ok(r.json.logs.length >= 4);

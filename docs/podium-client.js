@@ -122,13 +122,20 @@ async function postResults(slug, payload) {
 const cache = new Map(); // slug -> { at, list }
 const CACHE_MS = 5 * 60 * 1000;
 
-/** Defis actifs pour ce jeu. Tableau vide si le hub est injoignable. */
+/**
+ * Defis actifs pour ce jeu. Tableau vide si le hub est injoignable.
+ *
+ * La cle du jeu part avec la demande : c'est elle qui ouvre la graine du defi
+ * du jour. Sans elle le hub repond quand meme, mais sans graine — un jeu qui
+ * n'a pas encore recu sa cle affiche donc les defis sans pouvoir les jouer.
+ */
 async function activeChallenges(slug) {
   if (!enabled()) return [];
   const hit = cache.get(slug);
   if (hit && Date.now() - hit.at < CACHE_MS) return hit.list;
   try {
-    const res = await fetchJson(`${URL_BASE}/api/v1/games/${encodeURIComponent(slug)}/challenges/active`, {}, 5000);
+    const init = GAME_KEY ? { headers: { Authorization: `Bearer ${GAME_KEY}` } } : {};
+    const res = await fetchJson(`${URL_BASE}/api/v1/games/${encodeURIComponent(slug)}/challenges/active`, init, 5000);
     const list = res.ok && Array.isArray(res.json?.challenges) ? res.json.challenges : [];
     cache.set(slug, { at: Date.now(), list });
     return list;

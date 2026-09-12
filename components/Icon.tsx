@@ -28,6 +28,10 @@ export type IconName =
   | 'image'
   | 'musique'
   | 'liste'
+  | 'salon'
+  | 'etoile'
+  | 'etoileVide'
+  | 'graphe'
   | 'reglages'
   | 'verrou'
   | 'lien'
@@ -49,6 +53,14 @@ const PATHS: Record<IconName, string> = {
   'precedent': 'M12 3L6 8l6 5zM3 3h2v10H3z',
   'son': 'M2 6h3l4-3v10l-4-3H2zM11 5h1v6h-1zM13 3h1v10h-1z',
   'muet': 'M2 6h3l4-3v10l-4-3H2zM10 5h2v2h-2zM12 7h2v2h-2zM14 9h2v2h-2zM14 5h2v2h-2zM10 9h2v2h-2z',
+  // Une bulle carree a queue basse : le signe du salon.
+  'salon': 'M1 2h14v9H8l-3 3v-3H1zM4 5h8v1H4zM4 7h5v1H4z',
+  // Etoile de note : un losange epaissi, lisible a 16 px la ou cinq branches
+  // deviendraient une tache.
+  'etoile': 'M7 1h2v3h3v2h-1v1h-1v2h1v3H9v1H7v-1H5v-3h1V7H5V6H4V4h3z',
+  'etoileVide': 'M7 1h2v3h3v2h-1v1h-1v2h1v3H9v1H7v-1H5v-3h1V7H5V6H4V4h3zM7 5H6v1h1v4H6v2h1v1h2v-1h1v-2H9V6h1V5H9V2H7z',
+  // Trois barres de hauteurs differentes : la relecture chiffree.
+  'graphe': 'M1 13h14v1H1zM2 8h3v4H2zM6 4h3v8H6zM10 6h3v6h-3z',
   'micro': 'M6 2h4v7H6zM4 8h1v1h6V8h1v2H9v3h2v1H5v-1h2v-3H4z',
   'chrono': 'M6 0h4v2H6zM7 2h2v1H7zM11 3h2v2h-1V4h-1zM5 4h6v1H5zM3 5h2v1H3zM11 5h2v1h-2zM2 6h1v5H2zM13 6h1v5h-1zM7 6h1v3h2v1H7zM3 11h2v1H3zM11 11h2v1h-2zM5 12h6v1H5z',
   'trophee': 'M4 1h8v5H4zM2 2h2v3H2V4h1V3H2zM12 2h2v3h-2V4h1V3h-1zM5 6h6v1H5zM7 7h2v3H7zM5 10h6v1H5zM4 11h8v2H4z',

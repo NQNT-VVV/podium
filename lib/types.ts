@@ -78,3 +78,54 @@ export interface AdminOverview {
   games: Game[]; logs: { id: number; game_slug: string | null; external_id: string | null; status: string; detail: string | null; at: number }[];
   users: number; challenges: { active: Challenge[]; upcoming: Challenge[] }; metrics: string[]; timeZone: string;
 }
+
+/* ---- Salon, avis, reporting -------------------------------------- */
+
+/** Un message du fil. Efface, il ne porte plus ni corps ni auteur. */
+export interface ChatMessage {
+  id: number;
+  userId: string | null;
+  pseudo: string | null;
+  avatar: string | null;
+  role: 'player' | 'admin' | null;
+  body: string;
+  createdAt: number;
+  deleted: boolean;
+}
+export interface ChatData {
+  messages: ChatMessage[];
+  cursor: number;
+  me: { id: string; role: 'player' | 'admin' } | null;
+  limits: { length: number; gapMs: number; keepDays: number };
+}
+
+export type FeedbackKind = 'avis' | 'bug' | 'idee';
+export type FeedbackStatus = 'nouveau' | 'lu' | 'traite';
+export interface Feedback {
+  id: number;
+  userId: string | null;
+  pseudo: string | null;
+  avatar: string | null;
+  kind: FeedbackKind;
+  score: number | null;
+  body: string;
+  page: string;
+  status: FeedbackStatus;
+  note: string;
+  createdAt: number;
+  handledAt: number | null;
+  handledBy: string | null;
+}
+export interface AvisData { mine: Feedback[]; limits: { length: number } }
+
+export interface Reporting {
+  window: { days: number; since: number; until: number };
+  score: { average: number | null; count: number; spread: { score: number; n: number }[] };
+  kinds: Partial<Record<FeedbackKind, { n: number; average: number | null }>>;
+  statuses: Record<FeedbackStatus, number>;
+  daily: { at: number; n: number; average: number | null }[];
+  pages: { page: string; n: number }[];
+  chat: { messages: number; keepDays: number };
+  total: number;
+  items: Feedback[];
+}

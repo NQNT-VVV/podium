@@ -15,7 +15,14 @@ const metrics = require('./metrics');
 const ROOT_DIR = path.join(__dirname, '..');
 
 const app = express();
-app.set('trust proxy', true);
+/*
+ * Un seul relais devant nous, pas une chaine.
+ *
+ * `true` faisait confiance a tous les bonds, donc a l'en-tete envoye par le
+ * client : il suffisait d'en changer a chaque essai pour se donner un
+ * compteur neuf et rendre le limiteur de connexion decoratif.
+ */
+app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.use(express.json({ limit: '256kb' }));
 app.use(auth.attachUser);

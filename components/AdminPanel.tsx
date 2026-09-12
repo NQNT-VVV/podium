@@ -77,7 +77,12 @@ function ChallengeForm({ games, metrics, onDone }: { games: Game[]; metrics: str
     try {
       await api('POST', '/api/admin/challenges', {
         ...f, gameSlug: f.gameSlug || null, mode: f.mode || null, period: 'custom',
-        startsAt: f.startsAt ? new Date(f.startsAt).getTime() : undefined, endsAt: f.endsAt ? new Date(f.endsAt).getTime() : undefined,
+        // Les bornes partent telles qu'elles ont ete tapees. Les lire avec
+        // `new Date()` les interpretait dans le fuseau du navigateur, alors
+        // que le panneau affiche le fuseau du serveur juste a cote : un
+        // administrateur en voyage ouvrait une fenetre autre que celle qu'il
+        // avait ecrite. Le serveur, lui, sait dans quel fuseau il vit.
+        startsAt: f.startsAt || undefined, endsAt: f.endsAt || undefined,
       });
       toast('DEFI CREE', 'ok');
       onDone();
@@ -127,38 +132,50 @@ export function AdminPanel({ data }: { data: AdminOverview }) {
   const [editing, setEditing] = useState<string | null>(null); // slug, ou 'new'
   const [creatingChallenge, setCreatingChallenge] = useState(false);
   const [key, setKey] = useState<{ slug: string; key: string } | null>(null);
+  /*
+   * Un verrou pour toutes les actions du panneau.
+   *
+   * Les deux formulaires avaient le leur, ces boutons non. Un double clic sur
+   * « generer la cle » — dont la premiere generation ne demande aucune
+   * confirmation — en fabriquait deux et tuait sans un mot celle qui venait
+   * de s'afficher.
+   */
+  const [busy, setBusy] = useState(false);
 
   const refresh = () => { setEditing(null); setCreatingChallenge(false); router.refresh(); };
 
+  /** Enchaine une action en la protegeant du second clic. */
+  async function once(fn: () => Promise<void>) {
+    if (busy) return;
+    setBusy(true);
+    try { await fn(); } catch (err) { toast((err as Error).message.toUpperCase(), 'err'); } finally { setBusy(false); }
+  }
+
   async function rotateKey(g: Game) {
     if (g.hasKey && !confirm(`REGENERER LA CLE DE ${g.name.toUpperCase()} ? L’ANCIENNE CESSERA DE FONCTIONNER IMMEDIATEMENT.`)) return;
-    try {
+    await once(async () => {
       const r = await api<{ key: string }>('POST', `/api/admin/games/${g.slug}/key`);
       setKey({ slug: g.slug, key: r.key });
       router.refresh();
-    } catch (err) {
-      toast((err as Error).message.toUpperCase(), 'err');
-    }
+    });
   }
 
   async function removeGame(g: Game) {
     if (!confirm(`SUPPRIMER ${g.name.toUpperCase()} ET TOUT SON HISTORIQUE ? IRREVERSIBLE.`)) return;
-    try { await api('DELETE', `/api/admin/games/${g.slug}`); toast('JEU SUPPRIME', 'ok'); refresh(); } catch (err) { toast((err as Error).message.toUpperCase(), 'err'); }
+    await once(async () => { await api('DELETE', `/api/admin/games/${g.slug}`); toast('JEU SUPPRIME', 'ok'); refresh(); });
   }
 
   async function removeChallenge(c: Challenge) {
     if (!confirm(`SUPPRIMER LE DEFI « ${c.title.toUpperCase()} » ?`)) return;
-    try { await api('DELETE', `/api/admin/challenges/${c.id}`); toast('DEFI SUPPRIME', 'ok'); refresh(); } catch (err) { toast((err as Error).message.toUpperCase(), 'err'); }
+    await once(async () => { await api('DELETE', `/api/admin/challenges/${c.id}`); toast('DEFI SUPPRIME', 'ok'); refresh(); });
   }
 
   async function runScheduler() {
-    try {
+    await once(async () => {
       const r = await api<{ created: number; closed: number }>('POST', '/api/admin/challenges/run');
       toast(`${r.created} DEFI(S) CREE(S) · ${r.closed} CLOS`, 'ok');
       router.refresh();
-    } catch (err) {
-      toast((err as Error).message.toUpperCase(), 'err');
-    }
+    });
   }
 
   return (
@@ -179,8 +196,8 @@ export function AdminPanel({ data }: { data: AdminOverview }) {
                   <small>{(g.url || 'SANS URL').toUpperCase()} · {g.stats?.matches ?? 0} PARTIES · {g.modes.length} MODE(S) · CLE {g.hasKey ? 'DEFINIE' : 'ABSENTE'}</small>
                 </div>
                 <button className="btn xs" type="button" onClick={() => setEditing(editing === g.slug ? null : g.slug)}>MODIFIER</button>
-                <button className="btn xs" type="button" onClick={() => rotateKey(g)}>{g.hasKey ? 'REGENERER LA CLE' : 'GENERER LA CLE'}</button>
-                <button className="btn xs danger" type="button" onClick={() => removeGame(g)}>SUPPRIMER</button>
+                <button className="btn xs" type="button" disabled={busy} aria-busy={busy} onClick={() => rotateKey(g)}>{g.hasKey ? 'REGENERER LA CLE' : 'GENERER LA CLE'}</button>
+                <button className="btn xs danger" type="button" disabled={busy} onClick={() => removeGame(g)}>SUPPRIMER</button>
               </div>
               {key?.slug === g.slug && (
                 <div className="card pad col" style={{ gap: 10 }}>
@@ -201,7 +218,7 @@ export function AdminPanel({ data }: { data: AdminOverview }) {
       <section className="block">
         <div className="block-head">
           <h2 className="section-title">DEFIS</h2>
-          <button className="btn sm" type="button" onClick={runScheduler} title="Cree les defis manquants et clot ceux qui sont termines">LANCER LE PLANIFICATEUR</button>
+          <button className="btn sm" type="button" disabled={busy} aria-busy={busy} onClick={runScheduler} title="Cree les defis manquants et clot ceux qui sont termines">LANCER LE PLANIFICATEUR</button>
           <button className="btn sm primary" type="button" onClick={() => setCreatingChallenge(true)}>DEFI EXCEPTIONNEL</button>
         </div>
         {creatingChallenge && <div className="card pad"><ChallengeForm games={data.games} metrics={data.metrics} onDone={refresh} /></div>}
@@ -213,7 +230,7 @@ export function AdminPanel({ data }: { data: AdminOverview }) {
                 <b>{c.title.toUpperCase()} <span className="faint">· {c.game ? c.game.name.toUpperCase() : 'GLOBAL'} · {c.kind.toUpperCase()}{c.mode ? ` (${c.mode.toUpperCase()})` : ''} · {c.metric.toUpperCase()}</span></b>
                 <small>{c.state === 'active' ? 'EN COURS' : 'A VENIR'} · {fmtDate(c.startsAt, true)} → {fmtDate(c.endsAt, true)} · {c.slug}</small>
               </div>
-              <button className="btn xs danger" type="button" onClick={() => removeChallenge(c)}>SUPPRIMER</button>
+              <button className="btn xs danger" type="button" disabled={busy} onClick={() => removeChallenge(c)}>SUPPRIMER</button>
             </div>
           ))}
         </div>

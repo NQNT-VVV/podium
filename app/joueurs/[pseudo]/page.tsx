@@ -16,12 +16,14 @@ type Props = { params: Promise<{ pseudo: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { pseudo } = await params;
-  return { title: decodeURIComponent(pseudo) };
+  // Next a deja decode le parametre : le refaire casse « Jean%20Luc » et fait
+  // lever un URIError sur un pourcent isole.
+  return { title: pseudo };
 }
 
 export default async function PlayerPage({ params }: Props) {
   const { pseudo } = await params;
-  const data = await apiMaybe<PlayerData>(`/api/players/${encodeURIComponent(decodeURIComponent(pseudo))}`);
+  const data = await apiMaybe<PlayerData>(`/api/players/${encodeURIComponent(pseudo)}`);
   if (!data) notFound();
   const { user, ratings, season, badges, matches } = data;
 
@@ -75,7 +77,7 @@ export default async function PlayerPage({ params }: Props) {
       <div className="two-col">
         <section className="block">
           <div className="block-head"><h2 className="section-title">HISTORIQUE</h2></div>
-          <MatchList matches={matches} mine />
+          <MatchList matches={matches} mine meId={user.id} />
         </section>
         <section className="block">
           <div className="block-head"><h2 className="section-title">BADGES</h2></div>

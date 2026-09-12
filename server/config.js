@@ -120,6 +120,22 @@ const config = {
     maxPlayersPerMatch: int('MAX_PLAYERS_PER_MATCH', 200),
     loginAttempts: int('LOGIN_ATTEMPTS', 20),
     loginWindowMs: int('LOGIN_WINDOW_S', 900) * 1000,
+
+    /*
+     * Salon : de quoi tenir une conversation, pas de quoi la noyer.
+     *
+     * Le delai entre deux messages arrete le martelage ; le quota horaire
+     * arrete l'inondation lente qu'un simple delai laisserait passer.
+     */
+    chatLength: int('CHAT_LENGTH', 500),
+    chatGapMs: int('CHAT_GAP_S', 2) * 1000,
+    chatPerHour: int('CHAT_PER_HOUR', 120),
+    /** Au-dela, le salon oublie : les mots du salon sont ephemeres. */
+    chatKeepDays: int('CHAT_KEEP_DAYS', 90),
+
+    /** Avis : long pour decrire un bug, borne pour rester lisible. */
+    feedbackLength: int('FEEDBACK_LENGTH', 2000),
+    feedbackPerDay: int('FEEDBACK_PER_DAY', 10),
   },
 
   /** Frequence du planificateur (defis a creer, defis a clore). */
